@@ -16,6 +16,15 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        debug {
+            storeFile(new File("${project.getRootDir()}/wawa.jks"))
+            storePassword "legendream"
+            keyPassword "legendream"
+            keyAlias "key"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
