@@ -1,10 +1,9 @@
-package cn.legendream.wawa
+package cn.legendream.wawa.login
 
 import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.net.NetService
 import cn.legendream.wawa.app.scope.ActivityScope
-import cn.legendream.wawa.login.LoginPresenterImpl
 import com.hwangjr.rxbus.Bus
 import com.hwangjr.rxbus.RxBus
 import com.hwangjr.rxbus.annotation.Subscribe
@@ -23,9 +22,15 @@ import javax.inject.Inject
  */
 
 @ActivityScope
-class MainPresenterImpl @Inject constructor(private val application: WaWaApplication,
-                                            private val mainView: MainContract.MainView,
-                                            private val netService: NetService) : MainContract.MainPresenter {
+class LoginPresenterImpl @Inject constructor(private val application: WaWaApplication,
+                                             private val loginView: LoginContract.loginView,
+                                             private val netService: NetService) : LoginContract.LoginPresenter {
+
+    companion object {
+        const val SUCCESS_TAG = "success"
+        const val FAILURE_TAG = "failure"
+    }
+
     private val rxbus: Bus = RxBus.get()
 
     init {
@@ -41,8 +46,14 @@ class MainPresenterImpl @Inject constructor(private val application: WaWaApplica
 
 
     override fun weChatLogin() {
+//        rxbus.register(this)
         startWeChat()
+//        netService.wxlogin("123")
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe({ Timber.d(it.data.toString()) }, { Timber.d(it) })
     }
+
 
 
     @Subscribe(tags = arrayOf(Tag(LoginPresenterImpl.SUCCESS_TAG)),
@@ -59,10 +70,11 @@ class MainPresenterImpl @Inject constructor(private val application: WaWaApplica
 //        rxbus.unregister(this)
     }
 
+
     private fun startWeChat() {
         val req = SendAuth.Req()
         req.scope = "snsapi_userinfo"
         req.state = "wechat_sdk_demo_test"
-        Timber.d(wxApi.sendReq(req).toString())
+        wxApi.sendReq(req)
     }
 }

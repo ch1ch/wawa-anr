@@ -8,7 +8,7 @@ package cn.legendream.wawa.app
 
 class AppInfo {
     companion object {
-        const val WX_APP_ID = "wx6a80112f66ba9cd9"
+        const val WX_APP_ID = "wx9a7d6224ec489554"
         const val BASE_URL = "http://47.94.236.45:9000"
     }
 }

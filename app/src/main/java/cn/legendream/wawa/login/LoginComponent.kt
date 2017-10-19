@@ -1,8 +1,7 @@
-package cn.legendream.wawa
+package cn.legendream.wawa.login
 
 import cn.legendream.wawa.app.AppComponent
 import cn.legendream.wawa.app.scope.ActivityScope
-
 import dagger.Component
 
 /**
@@ -13,7 +12,7 @@ import dagger.Component
 
 
 @ActivityScope
-@Component(modules = arrayOf(MainModule::class), dependencies = arrayOf(AppComponent::class))
-interface MainComponent {
-    fun inject(mainActivity: MainActivity)
+@Component(modules = arrayOf(LoginModule::class), dependencies = arrayOf(AppComponent::class))
+interface LoginComponent {
+    fun inject(loginActivity: LoginActivity)
 }
