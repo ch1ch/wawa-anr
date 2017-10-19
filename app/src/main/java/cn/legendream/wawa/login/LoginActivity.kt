@@ -1,7 +1,10 @@
 package cn.legendream.wawa.login
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import butterknife.ButterKnife
 import butterknife.OnClick
 import cn.legendream.wawa.R
@@ -28,10 +31,19 @@ class LoginActivity : AppCompatActivity(), LoginContract.loginView {
     }
 
     override fun loginSuccess(user: User) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val intent = Intent()
+        intent.putExtra("user", user)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
     override fun loginError(error: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Toast.makeText(applicationContext, error, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 }

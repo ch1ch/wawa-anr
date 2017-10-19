@@ -2,6 +2,7 @@ package cn.legendream.wawa.app
 
 import android.app.Application
 import cn.legendream.wawa.BuildConfig
+import cn.legendream.wawa.app.user.UserManager
 import timber.log.Timber
 
 /**
@@ -18,6 +19,7 @@ class WaWaApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+        UserManager.init(this)
     }
 
     fun getAppComponent(): AppComponent {

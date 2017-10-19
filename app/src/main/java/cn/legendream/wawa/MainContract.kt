@@ -10,11 +10,11 @@ import cn.legendream.wawa.app.model.User
 
 interface MainContract {
     interface MainView {
-        fun loginSuccess(user: User)
-        fun loginError(error: String)
+        fun haveLogin(user: User)
+        fun noLogin()
     }
 
     interface MainPresenter {
-        fun weChatLogin()
+        fun checkLogin()
     }
 }

@@ -26,7 +26,10 @@ interface NetService {
 
 
     companion object {
-        val INSTANCE = getNetServiceInstance()
+        val INSTANCE: NetService by lazy {
+            getNetServiceInstance()
+        }
+
         private fun getNetServiceInstance(): NetService {
             val okHttp = OkHttpClient.Builder().addInterceptor(SignInterceptor())
             if (BuildConfig.DEBUG) {
@@ -40,4 +43,5 @@ interface NetService {
             return retrofit.create(NetService::class.java)
         }
     }
+
 }

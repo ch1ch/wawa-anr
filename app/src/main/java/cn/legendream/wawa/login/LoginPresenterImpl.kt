@@ -12,6 +12,9 @@ import com.hwangjr.rxbus.thread.EventThread
 import com.tencent.mm.opensdk.modelmsg.SendAuth
 import com.tencent.mm.opensdk.openapi.IWXAPI
 import com.tencent.mm.opensdk.openapi.WXAPIFactory
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,8 +26,8 @@ import javax.inject.Inject
 
 @ActivityScope
 class LoginPresenterImpl @Inject constructor(private val application: WaWaApplication,
-                                             private val loginView: LoginContract.loginView,
-                                             private val netService: NetService) : LoginContract.LoginPresenter {
+        private val loginView: LoginContract.loginView,
+        private val netService: NetService) : LoginContract.LoginPresenter {
 
     companion object {
         const val SUCCESS_TAG = "success"
@@ -32,6 +35,7 @@ class LoginPresenterImpl @Inject constructor(private val application: WaWaApplic
     }
 
     private val rxbus: Bus = RxBus.get()
+    private var loginDisposable: Disposable? = null
 
     init {
         rxbus.register(this)
@@ -46,28 +50,37 @@ class LoginPresenterImpl @Inject constructor(private val application: WaWaApplic
 
 
     override fun weChatLogin() {
-//        rxbus.register(this)
         startWeChat()
-//        netService.wxlogin("123")
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe({ Timber.d(it.data.toString()) }, { Timber.d(it) })
     }
 
-
+    override fun destroy() {
+        RxBus.get().unregister(this)
+        if (loginDisposable?.isDisposed == false) {
+            loginDisposable?.dispose()
+        }
+    }
 
     @Subscribe(tags = arrayOf(Tag(LoginPresenterImpl.SUCCESS_TAG)),
-        thread = EventThread.MAIN_THREAD)
-    fun login(string: String) {
-        Timber.d(string)
-//        rxbus.unregister(this)
+            thread = EventThread.MAIN_THREAD)
+    fun login(code: String) {
+        Timber.d(code)
+        loginDisposable = netService.wxlogin(code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+            if (it.code == 200 && it.data != null) {
+                val user = it.data!!
+                loginView.loginSuccess(user)
+            } else {
+                loginView.loginError(it.error ?: "未知错误${it.code}")
+            }
+        }, {
+            loginView.loginError("APP异常")
+        })
     }
 
     @Subscribe(tags = arrayOf(Tag(LoginPresenterImpl.FAILURE_TAG)),
-        thread = EventThread.MAIN_THREAD)
+            thread = EventThread.MAIN_THREAD)
     fun loginFaiure(string: String) {
         Timber.d(string)
-//        rxbus.unregister(this)
+        loginView.loginError(string)
     }
 
 

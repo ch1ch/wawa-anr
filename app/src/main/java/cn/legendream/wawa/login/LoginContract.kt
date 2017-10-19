@@ -16,5 +16,6 @@ interface LoginContract {
 
     interface LoginPresenter {
         fun weChatLogin()
+        fun destroy()
     }
 }
