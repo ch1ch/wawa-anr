@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -15,6 +16,7 @@ import cn.legendream.wawa.app.user.UserManager
 import cn.legendream.wawa.login.LoginActivity
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), MainContract.MainView {
@@ -25,11 +27,13 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     private var checkUserFinish = false
     private var loginFinish = true
     private var user: User? = null
+    private var callJSFinish = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DaggerMainComponent.builder().appComponent((application as WaWaApplication).getAppComponent())
-                .mainModule(MainModule(this)).build().inject(this)
+        DaggerMainComponent.builder().appComponent(
+            (application as WaWaApplication).getAppComponent())
+            .mainModule(MainModule(this)).build().inject(this)
         setContentView(R.layout.activity_main)
         ButterKnife.bind(this)
         initView()
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         web_view.settings.javaScriptEnabled = true
         web_view.settings.domStorageEnabled = true
         web_view.settings.setAppCacheEnabled(true)
+        web_view.addJavascriptInterface(WaWaJsInterface(), "androidApp")
         web_view.loadUrl("http://wawa.legendream.cn/#/home")
     }
 
@@ -64,6 +69,7 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     private fun callJsTransformUser(user: User) {
         val gson = Gson()
         web_view.loadUrl("javascript:getUserInfo('${gson.toJson(user)}')")
+        callJSFinish = true
     }
 
     private fun startLogin() {
@@ -90,6 +96,7 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     inner class WaWaWebViewClient : WebViewClient() {
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
+            if (callJSFinish) return
             pageLoadFinish = true
             if (checkUserFinish && user != null) {
                 callJsTransformUser(user!!)
@@ -101,5 +108,12 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     }
 
     inner class WaWaWebChromeClient : WebChromeClient()
+
+    inner class WaWaJsInterface {
+        @JavascriptInterface
+        fun joinRoom(roomJson: String) {
+            Timber.d(roomJson)
+        }
+    }
 
 }

@@ -26,59 +26,63 @@ import android.os.Parcelable
  */
 
 data class User(
-        var id: Int = 0,
-        var nickName: String? = null,
-        var userLevel: Int = 0,
-        var phoneNumber: String? = null,
-        var userPoint: Int = 0,
-        var headUrl: String? = null,
-        var gender: Int = 0,
-        var gameMoney: Int = 0,
-        var pushUserId: Int = 0,
-        var dollCount: Int = 0,
-        var status: Int = 0,
-        var token: String? = null,
-        var createTime: String? = null) : Parcelable {
-
-    constructor(source: Parcel) : this(
-            source.readInt(),
-            source.readString(),
-            source.readInt(),
-            source.readString(),
-            source.readInt(),
-            source.readString(),
-            source.readInt(),
-            source.readInt(),
-            source.readInt(),
-            source.readInt(),
-            source.readInt(),
-            source.readString(),
-            source.readString()
-    )
-
-    override fun describeContents() = 0
-
-    override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
-        writeInt(id)
-        writeString(nickName)
-        writeInt(userLevel)
-        writeString(phoneNumber)
-        writeInt(userPoint)
-        writeString(headUrl)
-        writeInt(gender)
-        writeInt(gameMoney)
-        writeInt(pushUserId)
-        writeInt(dollCount)
-        writeInt(status)
-        writeString(token)
-        writeString(createTime)
+    var id: Int = 0,
+    var nickName: String? = null,
+    var userLevel: Int = 0,
+    var phoneNumber: String? = null,
+    var userPoint: Int = 0,
+    var headUrl: String? = null,
+    var gender: Int = 0,
+    var gameMoney: Int = 0,
+    var pushUserId: Int = 0,
+    var dollCount: Int = 0,
+    var status: Int = 0,
+    var token: String? = null,
+    var createTime: String? = null) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readString(),
+        parcel.readInt(),
+        parcel.readString(),
+        parcel.readInt(),
+        parcel.readString(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readString(),
+        parcel.readString()) {
     }
 
-    companion object {
-        @JvmField
-        val CREATOR: Parcelable.Creator<User> = object : Parcelable.Creator<User> {
-            override fun createFromParcel(source: Parcel): User = User(source)
-            override fun newArray(size: Int): Array<User?> = arrayOfNulls(size)
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
+        parcel.writeString(nickName)
+        parcel.writeInt(userLevel)
+        parcel.writeString(phoneNumber)
+        parcel.writeInt(userPoint)
+        parcel.writeString(headUrl)
+        parcel.writeInt(gender)
+        parcel.writeInt(gameMoney)
+        parcel.writeInt(pushUserId)
+        parcel.writeInt(dollCount)
+        parcel.writeInt(status)
+        parcel.writeString(token)
+        parcel.writeString(createTime)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<User> {
+        override fun createFromParcel(parcel: Parcel): User {
+            return User(parcel)
+        }
+
+        override fun newArray(size: Int): Array<User?> {
+            return arrayOfNulls(size)
         }
     }
 }
+
