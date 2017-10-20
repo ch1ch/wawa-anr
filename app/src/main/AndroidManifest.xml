@@ -34,6 +34,7 @@
         <activity
             android:name=".login.LoginActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".live.LiveActivity" />
     </application>
 
 </manifest>

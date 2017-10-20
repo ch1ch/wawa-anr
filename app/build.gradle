@@ -64,6 +64,7 @@ dependencies {
     implementation ('com.hwangjr.rxbus:rxbus:2.0.0') {
         exclude group: 'com.jakewharton.timber', module: 'timber'
     }
+    implementation 'com.shuyu:GSYVideoPlayer:2.1.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

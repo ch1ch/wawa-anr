@@ -13,6 +13,7 @@ import butterknife.ButterKnife
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.model.User
 import cn.legendream.wawa.app.user.UserManager
+import cn.legendream.wawa.live.LiveActivity
 import cn.legendream.wawa.login.LoginActivity
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
@@ -113,6 +114,8 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         @JavascriptInterface
         fun joinRoom(roomJson: String) {
             Timber.d(roomJson)
+            val intent = Intent(this@MainActivity, LiveActivity::class.java)
+            startActivity(intent)
         }
     }
 
