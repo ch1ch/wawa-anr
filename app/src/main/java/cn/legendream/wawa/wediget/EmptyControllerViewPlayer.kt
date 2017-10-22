@@ -15,6 +15,10 @@ class EmptyControllerViewPlayer : StandardGSYVideoPlayer {
     constructor(context: Context, fullFlag: Boolean) : super(context, fullFlag)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
+
+    init {
+
+    }
     override fun getLayoutId(): Int {
         return R.layout.empty_control_video
     }
@@ -28,4 +32,19 @@ class EmptyControllerViewPlayer : StandardGSYVideoPlayer {
 
     override fun touchDoubleUp() {
     }
+
+
+    override fun prepareVideo() {
+        super.prepareVideo()
+    }
+
+    override fun setRotation(rotation: Float) {
+        super.setRotation(rotation)
+    }
+
+
+    override fun onInfo(what: Int, extra: Int) {
+        super.onInfo(what, extra)
+    }
+
 }
