@@ -1,24 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <FrameLayout
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
+
+    <FrameLayout
+        android:id="@+id/video_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foreground="@drawable/live_video_border"
+        app:layout_constraintBottom_toBottomOf="@id/guideline"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <cn.legendream.wawa.wediget.EmptyControllerViewPlayer
+            android:id="@+id/video_view"
             android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:background="@color/colorAccent">
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+    </FrameLayout>
 
-            <cn.legendream.wawa.wediget.EmptyControllerViewPlayer
-                android:id="@+id/video_view"
-                android:layout_gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </FrameLayout>
-    </LinearLayout>
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_controller"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.65" />
 
-</android.support.v4.widget.NestedScrollView>
+    <ImageView
+        android:id="@+id/iv_video_controller_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_live_video_controller_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline_controller" />
+
+    <ImageView
+        android:id="@+id/start_game"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_start_game"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:src="@drawable/ic_my_coin"
+        app:layout_constraintBottom_toBottomOf="@id/start_game"
+        app:layout_constraintLeft_toLeftOf="@id/start_game"
+        app:layout_constraintRight_toRightOf="@id/start_game" />
+
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_doll_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginTop="70dp"
+        android:background="@color/colorPrimary"
+        android:text="娃娃详情"
+        android:textColor="@color/md_white_1000"
+        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_doll_record"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:background="@color/colorPrimary"
+        android:text="抓取记录"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/md_white_1000"
+        app:layout_constraintTop_toBottomOf="@id/btn_doll_detail" />
+
+</android.support.constraint.ConstraintLayout>
