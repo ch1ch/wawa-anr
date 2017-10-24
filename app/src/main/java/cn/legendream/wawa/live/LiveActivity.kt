@@ -3,7 +3,7 @@ package cn.legendream.wawa.live
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
+import android.view.View
 import cn.legendream.wawa.R
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.contract.ExtraKey
@@ -11,7 +11,9 @@ import cn.legendream.wawa.app.extra.toast
 import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.user.UserManager
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
-import com.wilddog.client.*
+import com.wilddog.client.SyncReference
+import com.wilddog.video.base.LocalStream
+import com.wilddog.video.call.RemoteStream
 import kotlinx.android.synthetic.main.activity_live.*
 import kotlinx.android.synthetic.main.empty_control_video.view.*
 import timber.log.Timber
@@ -27,44 +29,7 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
 
     @Inject
     lateinit var mLivePresenter: LivePresenter
-    private val syncRef by lazy {
-        val ref = WilddogSync.getInstance().reference
 
-        ref.child(machine.id.toString())
-        ref.apply {
-            addChildEventListener(object : ChildEventListener {
-                override fun onCancelled(p0: SyncError?) {
-                    Timber.d("onCancelled")
-                }
-
-                override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
-                    Timber.d("onCancelled")
-                }
-
-                override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
-                    Timber.d("onChildChanged: ")
-                }
-
-                override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
-                    Timber.d("onChildAdded: ")
-                }
-
-                override fun onChildRemoved(p0: DataSnapshot?) {
-                    Timber.d("onChildRemoved: ")
-                }
-            })
-
-            addValueEventListener(object : ValueEventListener {
-                override fun onCancelled(p0: SyncError?) {
-                    Timber.d("onCancelled: ")
-                }
-
-                override fun onDataChange(p0: DataSnapshot?) {
-                    Timber.d("onDataChange: ")
-                }
-            })
-        }
-    }
 
     private lateinit var machine: Machine
 
@@ -94,7 +59,11 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
 
         start_game.setOnClickListener {
             Timber.d("start game")
+            video_view.onVideoPause()
+            video_view.visibility = View.INVISIBLE
+            wild_dog_view.visibility = View.VISIBLE
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
+            mLivePresenter.startGameVideo(machine.video1 ?: "")
         }
 
     }
@@ -113,8 +82,6 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
     override fun onDestroy() {
         super.onDestroy()
         video_view.release()
-
-
     }
 
     override fun onBackPressed() {
@@ -133,9 +100,26 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
 
     override fun waitGame() {
         Timber.d("waitGame: ")
+        SyncReference.goOnline()
     }
 
     override fun crateOrderError(error: String) {
         toast(error)
+    }
+
+    override fun showGameVideo(remoteStream: RemoteStream) {
+//        wild_dog_view.visibility = View.VISIBLE
+        Timber.d("show game video")
+        remoteStream.attach(wild_dog_view)
+    }
+
+    override fun showLocalVideo(localStream: LocalStream) {
+        Timber.d("show local video")
+        localStream.attach(wild_dog_view)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mLivePresenter.destroy()
     }
 }

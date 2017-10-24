@@ -3,11 +3,11 @@ package cn.legendream.wawa.app
 import android.app.Application
 import cn.legendream.wawa.BuildConfig
 import cn.legendream.wawa.app.user.UserManager
-import timber.log.Timber
-import com.wilddog.client.WilddogSync
-import com.wilddog.client.SyncReference
+import com.wilddog.video.base.WilddogVideoInitializer
+import com.wilddog.wilddogauth.WilddogAuth
 import com.wilddog.wilddogcore.WilddogApp
 import com.wilddog.wilddogcore.WilddogOptions
+import timber.log.Timber
 
 
 /**
@@ -31,9 +31,19 @@ class WaWaApplication : Application() {
 
     private fun initDillDog() {
         val options = WilddogOptions.Builder().setSyncUrl(
-            "https://wd2620361786fgzrcs.wilddogio.com").build()
+                "https://wd2620361786fgzrcs.wilddogio.com").build()
         WilddogApp.initializeApp(this, options)
-
+        WilddogAuth.getInstance().signInAnonymously().addOnCompleteListener { task ->
+            kotlin.run {
+                if (task.isSuccessful) {
+                    val wilddogUser = task.result.wilddogUser
+                    val token = wilddogUser.getToken(false).result.token
+                    WilddogVideoInitializer.initialize(applicationContext, "wd2620361786fgzrcs", token)
+                } else {
+                    Timber.d("wilddog login failure")
+                }
+            }
+        }
     }
 
     fun getAppComponent(): AppComponent {

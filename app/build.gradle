@@ -66,6 +66,8 @@ dependencies {
     }
     implementation 'com.shuyu:GSYVideoPlayer:2.1.0'
     implementation 'com.wilddog.client:wilddog-sync-android:2.3.7'
+    implementation 'com.wilddog.client:wilddog-auth-android:2.0.7'
+    implementation 'com.wilddog.client:wilddog-video-call-android:2.2.1'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

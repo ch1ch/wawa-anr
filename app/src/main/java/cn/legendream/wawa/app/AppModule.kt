@@ -23,7 +23,8 @@ class AppModule(private val application: WaWaApplication) {
 
     @Provides
     @Singleton
-    fun provideNetService():NetService {
+    fun provideNetService(): NetService {
         return NetService.INSTANCE
     }
+
 }
