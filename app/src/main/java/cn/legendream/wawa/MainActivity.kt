@@ -11,6 +11,8 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import butterknife.ButterKnife
 import cn.legendream.wawa.app.WaWaApplication
+import cn.legendream.wawa.app.contract.ExtraKey
+import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.model.User
 import cn.legendream.wawa.app.user.UserManager
 import cn.legendream.wawa.live.LiveActivity
@@ -114,8 +116,13 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         @JavascriptInterface
         fun joinRoom(roomJson: String) {
             Timber.d(roomJson)
-            val intent = Intent(this@MainActivity, LiveActivity::class.java)
-            startActivity(intent)
+            val machine = Gson().fromJson(roomJson, Machine::class.java)
+            if (machine != null) {
+                val intent = Intent(this@MainActivity, LiveActivity::class.java)
+                intent.putExtra(ExtraKey.EXTRA_MACHINE, machine)
+                startActivity(intent)
+            }
+
         }
     }
 

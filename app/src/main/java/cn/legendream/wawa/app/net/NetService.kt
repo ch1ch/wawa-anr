@@ -24,6 +24,9 @@ interface NetService {
     @GET("user/wxLogin")
     fun wxlogin(@Query("code") code: String): Observable<APIResponse<User>>
 
+    @GET("order/createOrder")
+    fun createOrder(@Query("token") token: String, @Query("machineId") int: Int):Observable<APIResponse<Any>>
+
 
     companion object {
         val INSTANCE: NetService by lazy {
