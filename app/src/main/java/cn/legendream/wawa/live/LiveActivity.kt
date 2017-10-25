@@ -63,7 +63,7 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
             video_view.visibility = View.INVISIBLE
             wild_dog_view.visibility = View.VISIBLE
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
-            mLivePresenter.startGameVideo(machine.video1 ?: "")
+//            mLivePresenter.startGameVideo(machine.video1 ?: "")
         }
 
     }
@@ -100,7 +100,10 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
 
     override fun waitGame() {
         Timber.d("waitGame: ")
-        SyncReference.goOnline()
+    }
+
+    override fun finishWait() {
+        mLivePresenter.startGameVideo(machine.video1 ?: "")
     }
 
     override fun crateOrderError(error: String) {

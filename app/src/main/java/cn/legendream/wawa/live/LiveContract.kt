@@ -11,6 +11,7 @@ interface LiveContract {
     interface View {
         fun startGame()
         fun waitGame()
+        fun finishWait()
         fun crateOrderError(error: String)
         fun showGameVideo(remoteStream: RemoteStream)
         fun showLocalVideo(localStream: LocalStream)

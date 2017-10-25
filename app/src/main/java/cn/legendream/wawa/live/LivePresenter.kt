@@ -1,6 +1,8 @@
 package cn.legendream.wawa.live
 
 import cn.legendream.wawa.app.net.NetService
+import cn.legendream.wawa.app.net.NetServiceCode
+import cn.legendream.wawa.app.user.UserManager
 import com.wilddog.client.*
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.base.LocalStreamOptions
@@ -19,16 +21,18 @@ import javax.inject.Inject
  */
 
 
-class LivePresenter @Inject constructor(private val liveView: LiveContract.View, private val netService: NetService) : LiveContract.Presenter {
+class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
+                                        private val netService: NetService) : LiveContract.Presenter {
 
     private val localStream by lazy {
         val localStreamOptionsBuilder = LocalStreamOptions.Builder()
-        localStreamOptionsBuilder.captureAudio(false).captureVideo(true)
+        localStreamOptionsBuilder.captureAudio(true).captureVideo(true)
         val opt = localStreamOptionsBuilder.build()
         LocalStream.create(opt)
     }
 
     private var syncRef: SyncReference? = null
+    private var conversation: Conversation? = null
 
     private val valueEventListener by lazy {
         object : ValueEventListener {
@@ -37,9 +41,15 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
             }
 
             override fun onDataChange(p0: DataSnapshot?) {
-                Timber.d("onDataChange: ")
-//                TODO("排队至当前用户删除监听")
-                syncRef?.removeEventListener(this)
+                Timber.d("onDataChange: ${p0.toString()}")
+                if (p0?.exists() == true) {
+                    @Suppress("UNCHECKED_CAST")
+                    val userIdList = p0.value as ArrayList<Long>
+                    if (userIdList[1] == UserManager.getUser()?.id ?: -1) {
+                        liveView.finishWait()
+                        syncRef?.removeEventListener(this)
+                    }
+                }
             }
         }
     }
@@ -48,14 +58,17 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
 
     override fun createOrder(machineId: Int, token: String) {
         netService.createOrder(token, machineId).subscribeOn(
-                Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+            Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
             Timber.d("createOrder: $it")
-            if (it.code == 200) {
-                liveView.startGame()
-            } else {
-                liveView.waitGame()
-                syncRef = WilddogSync.getInstance().getReference("$machineId")
-                syncRef?.addValueEventListener(valueEventListener)
+            when {
+                it.code == NetServiceCode.NORMAL.code -> liveView.startGame()
+                it.code == NetServiceCode.PUT_USER_LINE.code -> {
+                    liveView.waitGame()
+                    syncRef = WilddogSync.getInstance().getReference("$machineId")
+                    syncRef?.addValueEventListener(valueEventListener)
+                    SyncReference.goOnline()
+                }
+                else -> liveView.crateOrderError(it.error.toString())
             }
         }, {
             it.printStackTrace()
@@ -66,12 +79,16 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
 
     override fun startGameVideo(videoId: String) {
         Timber.d("prepare video by $videoId")
-//        liveView.showLocalVideo(localStream)
-        val conversation = WilddogVideoCall.getInstance().call(videoId, localStream, "")
-        conversation.setConversationListener(object : Conversation.Listener {
+        val video = WilddogVideoCall.getInstance()
+
+//        val conversation = video.call(videoId, localStream, "test")
+        conversation = video.call(videoId, localStream, "test")
+        conversation?.setConversationListener(object : Conversation.Listener {
             override fun onStreamReceived(p0: RemoteStream?) {
+                Timber.d("onStreamReceived")
                 if (p0 != null) {
                     remoteStream = p0
+                    remoteStream?.enableAudio(false)
                     liveView.showGameVideo(p0)
                 }
             }
@@ -89,11 +106,14 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
             }
         })
 
+
     }
 
     override fun destroy() {
-        localStream.detach()
-        remoteStream?.detach()
+//      localStream.detach()
+// remoteStream?.detach()
+        conversation?.close()
+        conversation = null
     }
 
 }

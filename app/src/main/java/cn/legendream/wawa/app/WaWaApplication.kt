@@ -38,7 +38,8 @@ class WaWaApplication : Application() {
                 if (task.isSuccessful) {
                     val wilddogUser = task.result.wilddogUser
                     val token = wilddogUser.getToken(false).result.token
-                    WilddogVideoInitializer.initialize(applicationContext, "wd2620361786fgzrcs", token)
+                    WilddogVideoInitializer.initialize(applicationContext, "wd0062598867lwtpxz", token)
+                    Timber.d("Token:$token , ${wilddogUser.uid}")
                 } else {
                     Timber.d("wilddog login failure")
                 }
