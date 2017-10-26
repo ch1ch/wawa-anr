@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.Toast
 import cn.legendream.wawa.R
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.contract.ExtraKey
@@ -42,16 +43,11 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
 
 
     private fun init() {
-//        GSYVideoType.setShowType(GSYVideoType.SCREEN_TYPE_16_9)
-//        video_view.setUp("http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f30.mp4", true, "demo")
-//        video_view.setUp("rtmp://10799.liveplay.myqcloud.com/live/10799_10799_e02471ee11", false, "demo")
-//        video_view.setUp("http://10799.liveplay.myqcloud.com/live/10799_784387bddc_900.flv", false, "demo")
-
         machine = intent.getParcelableExtra(ExtraKey.EXTRA_MACHINE)
         DaggerLiveComponent.builder().appComponent(
             (application as WaWaApplication).getAppComponent()).liveModule(
             LiveModule(this)).build().inject(this)
-        video_view.setUp("rtmp://10799.liveplay.myqcloud.com/live/10799_784387bddc", false, "demo")
+        video_view.setUp("rtmp://${machine.video3}", false, "demo")
 //        GSYVideoManager.instance().
 //        video_view.rotation = 90f
         video_view.surface_container.rotation = 90f
@@ -64,6 +60,22 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
             wild_dog_view.visibility = View.VISIBLE
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
 //            mLivePresenter.startGameVideo(machine.video1 ?: "")
+        }
+
+        btn_catch.setOnClickListener {
+            Timber.d("start game video")
+            if (wild_dog_view.visibility == View.VISIBLE) {
+                mLivePresenter.destroy()
+                video_view.visibility = View.VISIBLE
+                wild_dog_view.visibility = View.GONE
+                video_view.startPlayLogic()
+            } else {
+                video_view.release()
+                video_view.visibility = View.INVISIBLE
+                wild_dog_view.visibility = View.VISIBLE
+                mLivePresenter.startGameVideo(machine.video1 ?: "")
+            }
+
         }
 
     }
@@ -100,6 +112,7 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
 
     override fun waitGame() {
         Timber.d("waitGame: ")
+        toast("排队中...   请稍后.....", Toast.LENGTH_LONG)
     }
 
     override fun finishWait() {

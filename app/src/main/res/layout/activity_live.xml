@@ -2,9 +2,9 @@
 
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
 
     <android.support.constraint.Guideline
@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8" />
+        app:layout_constraintGuide_percent="0.8"/>
 
     <FrameLayout
         android:id="@+id/video_container"
@@ -29,14 +29,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:visibility="invisible"/>
+            android:visibility="visible"/>
 
         <com.wilddog.video.base.WilddogVideoView
             android:id="@+id/wild_dog_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            tools:visibility="gone"/>
+            android:visibility="gone"/>
 
     </FrameLayout>
 
@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.65" />
+        app:layout_constraintGuide_percent="0.65"/>
 
     <ImageView
         android:id="@+id/iv_video_controller_bg"
@@ -56,7 +56,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guideline_controller" />
+        app:layout_constraintTop_toTopOf="@id/guideline_controller"/>
 
     <ImageView
         android:id="@+id/start_game"
@@ -65,7 +65,7 @@
         android:src="@drawable/ic_start_game"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg" />
+        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"/>
 
     <ImageView
         android:layout_width="0dp"
@@ -74,7 +74,18 @@
         android:src="@drawable/ic_my_coin"
         app:layout_constraintBottom_toBottomOf="@id/start_game"
         app:layout_constraintLeft_toLeftOf="@id/start_game"
-        app:layout_constraintRight_toRightOf="@id/start_game" />
+        app:layout_constraintRight_toRightOf="@id/start_game"/>
+
+    <ImageView
+        android:id="@+id/btn_catch"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_catch"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="70dp"/>
 
 
     <android.support.v7.widget.AppCompatButton
@@ -85,16 +96,16 @@
         android:background="@color/colorPrimary"
         android:text="娃娃详情"
         android:textColor="@color/md_white_1000"
-        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg" />
+        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"/>
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/btn_doll_record"
         android:layout_width="wrap_content"
         android:layout_height="32dp"
+        android:layout_marginTop="16dp"
         android:background="@color/colorPrimary"
         android:text="抓取记录"
-        android:layout_marginTop="16dp"
         android:textColor="@color/md_white_1000"
-        app:layout_constraintTop_toBottomOf="@id/btn_doll_detail" />
+        app:layout_constraintTop_toBottomOf="@id/btn_doll_detail"/>
 
 </android.support.constraint.ConstraintLayout>
