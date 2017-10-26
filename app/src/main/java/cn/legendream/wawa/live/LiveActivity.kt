@@ -12,7 +12,6 @@ import cn.legendream.wawa.app.extra.toast
 import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.user.UserManager
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
-import com.wilddog.client.SyncReference
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.call.RemoteStream
 import kotlinx.android.synthetic.main.activity_live.*
@@ -47,6 +46,7 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
         DaggerLiveComponent.builder().appComponent(
             (application as WaWaApplication).getAppComponent()).liveModule(
             LiveModule(this)).build().inject(this)
+        Timber.d("video3:  ---  rtmp://${machine.video3} ")
         video_view.setUp("rtmp://${machine.video3}", false, "demo")
 //        GSYVideoManager.instance().
 //        video_view.rotation = 90f
@@ -71,10 +71,11 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
                 video_view.startPlayLogic()
             } else {
                 video_view.release()
-                video_view.visibility = View.INVISIBLE
+                video_view.visibility = View.GONE
                 wild_dog_view.visibility = View.VISIBLE
                 mLivePresenter.startGameVideo(machine.video1 ?: "")
             }
+
 
         }
 
@@ -126,6 +127,7 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
     override fun showGameVideo(remoteStream: RemoteStream) {
 //        wild_dog_view.visibility = View.VISIBLE
         Timber.d("show game video")
+        toast("show game video")
         remoteStream.attach(wild_dog_view)
     }
 

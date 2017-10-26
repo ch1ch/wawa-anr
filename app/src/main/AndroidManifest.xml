@@ -54,6 +54,8 @@
         <activity
             android:name=".live.LiveActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".dolldetail.DollDetailActivity" />
+        <activity android:name=".catchrecord.CatchRecordActivity" />
 
     </application>
 
