@@ -68,6 +68,7 @@
         app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"/>
 
     <ImageView
+        android:id="@+id/iv_charge"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
@@ -76,16 +77,62 @@
         app:layout_constraintLeft_toLeftOf="@id/start_game"
         app:layout_constraintRight_toRightOf="@id/start_game"/>
 
+
+    <FrameLayout
+        android:id="@+id/lay_game_controller"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/move_up"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="center"
+            android:src="@drawable/ic_catch_up"/>
+
+        <ImageView
+            android:id="@+id/move_down"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:scaleType="center"
+            android:src="@drawable/ic_catch_down"/>
+
+        <ImageView
+            android:id="@+id/move_left"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_vertical|left"
+            android:scaleType="center"
+            android:src="@drawable/ic_catch_left"/>
+
+        <ImageView
+            android:id="@+id/move_right"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_vertical|right"
+            android:scaleType="center"
+            android:src="@drawable/ic_catch_right"/>
+    </FrameLayout>
+
     <ImageView
         android:id="@+id/btn_catch"
         android:layout_width="0dp"
         android:layout_height="64dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="70dp"
         android:scaleType="center"
         android:src="@drawable/ic_catch"
+        android:visibility="gone"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="70dp"/>
+        tools:visibility="visible"/>
 
 
     <android.support.v7.widget.AppCompatButton

@@ -55,29 +55,48 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
 
         start_game.setOnClickListener {
             Timber.d("start game")
-            video_view.onVideoPause()
-            video_view.visibility = View.INVISIBLE
-            wild_dog_view.visibility = View.VISIBLE
+            video_view.release()
+            showGameControllerPanel()
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
-//            mLivePresenter.startGameVideo(machine.video1 ?: "")
+
+            // TODO: 此处为演示切换视频源 请注意检查实际逻辑
+            mLivePresenter.startGameVideo(machine.video1 ?: "")
         }
 
         btn_catch.setOnClickListener {
             Timber.d("start game video")
-            if (wild_dog_view.visibility == View.VISIBLE) {
+            if (wild_dog_view.visibility == View.VISIBLE) { //游戏中 切换至 直播
+                showLiveControllerPanel()
                 mLivePresenter.destroy()
-                video_view.visibility = View.VISIBLE
-                wild_dog_view.visibility = View.GONE
                 video_view.startPlayLogic()
-            } else {
+
+            } else { //  直播 切换至 游戏中
                 video_view.release()
-                video_view.visibility = View.GONE
-                wild_dog_view.visibility = View.VISIBLE
+                showGameControllerPanel()
                 mLivePresenter.startGameVideo(machine.video1 ?: "")
             }
 
-
         }
+
+    }
+
+    private fun showLiveControllerPanel() {
+        video_view.visibility = View.VISIBLE
+        wild_dog_view.visibility = View.GONE
+        start_game.visibility = View.VISIBLE
+        iv_charge.visibility = View.VISIBLE
+        lay_game_controller.visibility = View.GONE
+        btn_catch.visibility = View.GONE
+
+    }
+
+    private fun showGameControllerPanel() {
+        video_view.visibility = View.GONE
+        wild_dog_view.visibility = View.VISIBLE
+        start_game.visibility = View.GONE
+        iv_charge.visibility = View.GONE
+        lay_game_controller.visibility = View.VISIBLE
+        btn_catch.visibility = View.VISIBLE
 
     }
 

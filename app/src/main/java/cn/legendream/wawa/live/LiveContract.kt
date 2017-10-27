@@ -20,7 +20,16 @@ interface LiveContract {
 
     interface Presenter {
         fun createOrder(machineId: Int, token: String)
-        fun startGameVideo(videoId:String)
+        fun startGameVideo(videoId: String)
+        fun movePawTo(pawOrientation: PawOrientation)
+        fun catch()
         fun destroy()
+    }
+
+    enum class PawOrientation(val  orientation: Int) {
+        UP(0),
+        DOWN(1),
+        LEFT(2),
+        RIGHT(3)
     }
 }

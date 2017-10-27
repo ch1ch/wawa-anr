@@ -105,8 +105,14 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                 Timber.d("onError")
             }
         })
+    }
 
+    override fun movePawTo(pawOrientation: LiveContract.PawOrientation) {
+        // TODO : 控制方向
+    }
 
+    override fun catch() {
+        // TODO: 下爪
     }
 
     override fun destroy() {
