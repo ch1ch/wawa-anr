@@ -1,4 +1,4 @@
-package cn.legendream.wawa.catchrecord
+package cn.legendream.wawa.clutchrecord
 
 import android.support.v7.app.AppCompatActivity
 

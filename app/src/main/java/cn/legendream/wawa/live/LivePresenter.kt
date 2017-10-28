@@ -11,8 +11,6 @@ import com.wilddog.video.call.CallStatus
 import com.wilddog.video.call.Conversation
 import com.wilddog.video.call.RemoteStream
 import com.wilddog.video.call.WilddogVideoCall
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,8 +29,13 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         LocalStream.create(opt)
     }
 
+    private var waitGame = false
+
     private var syncRef: SyncReference? = null
     private var conversation: Conversation? = null
+    private val user by lazy {
+        UserManager.getUser()
+    }
 
     private val valueEventListener by lazy {
         object : ValueEventListener {
@@ -43,11 +46,17 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
             override fun onDataChange(p0: DataSnapshot?) {
                 Timber.d("onDataChange: ${p0.toString()}")
                 if (p0?.exists() == true) {
-                    @Suppress("UNCHECKED_CAST")
-                    val userIdList = p0.value as ArrayList<Long>
-                    if (userIdList[1] == UserManager.getUser()?.id ?: -1) {
-                        liveView.finishWait()
-                        syncRef?.removeEventListener(this)
+                    if (waitGame) {
+                        @Suppress("UNCHECKED_CAST")
+                        val userIdList = p0.value as ArrayList<Long?>
+                        val userId = userIdList.find {
+                            user?.id == it?.toInt() ?: -1
+                        }
+                        if (userId == null) {
+                            waitGame = false
+                            liveView.finishWait()
+                            syncRef?.removeEventListener(this)
+                        }
                     }
                 }
             }
@@ -57,12 +66,15 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     private var remoteStream: RemoteStream? = null
 
     override fun createOrder(machineId: Int, token: String) {
-        netService.createOrder(token, machineId).subscribeOn(
-            Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+        netService.createOrder(token, machineId).compose(NetService.ioToMain()).subscribe({
             Timber.d("createOrder: $it")
             when {
-                it.code == NetServiceCode.NORMAL.code -> liveView.startGame()
+                it.code == NetServiceCode.NORMAL.code -> kotlin.run {
+                    waitGame = false
+                    liveView.startGame()
+                }
                 it.code == NetServiceCode.PUT_USER_LINE.code -> {
+                    waitGame = true
                     liveView.waitGame()
                     syncRef = WilddogSync.getInstance().getReference("$machineId")
                     syncRef?.addValueEventListener(valueEventListener)
@@ -73,6 +85,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         }, {
             it.printStackTrace()
             liveView.crateOrderError(it.message.toString())
+            Double
         }
         )
     }
@@ -107,12 +120,28 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         })
     }
 
-    override fun movePawTo(pawOrientation: LiveContract.PawOrientation) {
-        // TODO : 控制方向
+    override fun movePawTo(pawDirection: LiveContract.PawDirection) {
+        netService.movePawTo(action = pawDirection.direction).compose(NetService.ioToMain()).subscribe({
+            if (it.code != NetServiceCode.NORMAL.code) {
+                liveView.movePawFailure(pawDirection, it.error.toString())
+            } else {
+                liveView.movePawSuccess(pawDirection)
+            }
+        }, {
+            liveView.movePawFailure(pawDirection, it.message.toString())
+        })
     }
 
-    override fun catch() {
-        // TODO: 下爪
+    override fun clutch() {
+        netService.pawCatch().compose(NetService.ioToMain()).subscribe({
+            if (it.code != NetServiceCode.NORMAL.code) {
+                liveView.movePawFailure(LiveContract.PawDirection.CATCH, it.error.toString())
+            } else {
+                liveView.pawCatchSuccess()
+            }
+        }, {
+            liveView.pawCatchFailure(it.message.toString())
+        })
     }
 
     override fun destroy() {

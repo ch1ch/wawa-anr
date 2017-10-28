@@ -1,5 +1,6 @@
 package cn.legendream.wawa.live
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
@@ -11,6 +12,7 @@ import cn.legendream.wawa.app.contract.ExtraKey
 import cn.legendream.wawa.app.extra.toast
 import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.user.UserManager
+import cn.legendream.wawa.dolldetail.DollDetailActivity
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.call.RemoteStream
@@ -25,13 +27,24 @@ import javax.inject.Inject
  * E-Mail: zhaoxiyuan@kokozu.net
  */
 
-class LiveActivity : AppCompatActivity(), LiveContract.View {
+class LiveActivity : AppCompatActivity(),
+                     LiveContract.View {
 
     @Inject
     lateinit var mLivePresenter: LivePresenter
 
-
     private lateinit var machine: Machine
+
+    private val pawDirectionKeyListener by lazy {
+        View.OnClickListener { keyView ->
+            when (keyView.id) {
+                R.id.move_up -> mLivePresenter.movePawTo(LiveContract.PawDirection.UP)
+                R.id.move_down -> mLivePresenter.movePawTo(LiveContract.PawDirection.DOWN)
+                R.id.move_left -> mLivePresenter.movePawTo(LiveContract.PawDirection.LEFT)
+                R.id.move_right -> mLivePresenter.movePawTo(LiveContract.PawDirection.RIGHT)
+            }
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,29 +66,39 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
         video_view.surface_container.rotation = 90f
         video_view.startPlayLogic()
 
+
         start_game.setOnClickListener {
             Timber.d("start game")
-            video_view.release()
-            showGameControllerPanel()
+//            video_view.release()
+//            showGameControllerPanel()
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
 
             // TODO: 此处为演示切换视频源 请注意检查实际逻辑
-            mLivePresenter.startGameVideo(machine.video1 ?: "")
+//            mLivePresenter.startGameVideo(machine.video1 ?: "")
         }
 
         btn_catch.setOnClickListener {
             Timber.d("start game video")
             if (wild_dog_view.visibility == View.VISIBLE) { //游戏中 切换至 直播
-                showLiveControllerPanel()
-                mLivePresenter.destroy()
-                video_view.startPlayLogic()
+
+                mLivePresenter.clutch()
 
             } else { //  直播 切换至 游戏中
                 video_view.release()
                 showGameControllerPanel()
                 mLivePresenter.startGameVideo(machine.video1 ?: "")
             }
+        }
 
+        move_up.setOnClickListener(pawDirectionKeyListener)
+        move_down.setOnClickListener(pawDirectionKeyListener)
+        move_left.setOnClickListener(pawDirectionKeyListener)
+        move_right.setOnClickListener(pawDirectionKeyListener)
+
+        btn_doll_detail.setOnClickListener{
+            val intent = Intent(this@LiveActivity, DollDetailActivity::class.java)
+            intent.putExtra(ExtraKey.EXTRA_DOLL_IMAGE_URL, machine.dollImg)
+            startActivity(intent)
         }
 
     }
@@ -128,6 +151,9 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
 
     override fun startGame() {
         Timber.d("startGame: ")
+        video_view.release()
+        showGameControllerPanel()
+        mLivePresenter.startGameVideo(machine.video1 ?: "")
     }
 
     override fun waitGame() {
@@ -136,7 +162,8 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
     }
 
     override fun finishWait() {
-        mLivePresenter.startGameVideo(machine.video1 ?: "")
+        Timber.d("wait end. startGame: ")
+        startGame()
     }
 
     override fun crateOrderError(error: String) {
@@ -155,8 +182,30 @@ class LiveActivity : AppCompatActivity(), LiveContract.View {
         localStream.attach(wild_dog_view)
     }
 
+    override fun movePawSuccess(direction: LiveContract.PawDirection) {
+        Timber.d("$direction Success")
+    }
+
+    override fun movePawFailure(direction: LiveContract.PawDirection, error: String) {
+        Timber.d("$direction Failure. $error")
+
+    }
+
+    override fun pawCatchSuccess() {
+        Timber.d("Paw clutch success. ")
+        showLiveControllerPanel()
+        mLivePresenter.destroy()
+        video_view.startPlayLogic()
+    }
+
+    override fun pawCatchFailure(error: String) {
+        Timber.d("Paw clutch Failure. $error")
+
+    }
+
     override fun onStop() {
         super.onStop()
         mLivePresenter.destroy()
     }
+
 }

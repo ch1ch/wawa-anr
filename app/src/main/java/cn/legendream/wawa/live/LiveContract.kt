@@ -15,21 +15,27 @@ interface LiveContract {
         fun crateOrderError(error: String)
         fun showGameVideo(remoteStream: RemoteStream)
         fun showLocalVideo(localStream: LocalStream)
+        fun movePawSuccess(direction: PawDirection)
+        fun movePawFailure(direction: PawDirection, error: String)
+        fun pawCatchSuccess()
+        fun pawCatchFailure( error: String)
     }
 
 
     interface Presenter {
         fun createOrder(machineId: Int, token: String)
         fun startGameVideo(videoId: String)
-        fun movePawTo(pawOrientation: PawOrientation)
-        fun catch()
+        fun movePawTo(pawDirection: PawDirection)
+        fun clutch()
         fun destroy()
     }
 
-    enum class PawOrientation(val  orientation: Int) {
-        UP(0),
-        DOWN(1),
-        LEFT(2),
-        RIGHT(3)
+    enum class PawDirection(val direction: Int) {
+        UP(1),
+        DOWN(2),
+        LEFT(3),
+        RIGHT(4),
+        CATCH(6)
+
     }
 }

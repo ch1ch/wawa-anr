@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <bitmap
+            android:antialias="true"
+            android:gravity="fill_horizontal"
+            android:src="@drawable/img_listbg"
+            android:tileMode="repeat" />
+    </item>
+
+    <item
+        android:bottom="8dp"
+        android:left="8dp"
+        android:right="8dp"
+        android:top="30dp">
+        <shape>
+            <corners android:radius="4dp" />
+            <stroke
+                android:width="2dp"
+                android:color="@color/md_brown_500" />
+            <solid android:color="@color/md_white_1000" />
+        </shape>
+    </item>
+
+    <item
+        android:left="8dp"
+        android:top="8dp">
+        <bitmap
+            android:antialias="true"
+            android:gravity="top|left"
+            android:src="@drawable/ic_detail_top_bg" />
+    </item>
+
+    <item
+        android:bottom="8dp"
+        android:left="8dp"
+        android:right="8dp">
+        <bitmap
+            android:antialias="true"
+            android:gravity="bottom|fill_horizontal"
+            android:src="@drawable/ic_detail_bottom" />
+    </item>
+
+</layer-list>
+
+

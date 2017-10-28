@@ -7,5 +7,5 @@ package cn.legendream.wawa.app.model
  */
 data class APIResponse<T>(
         var code: Int = 0,
-        var error: String? = null,
+        var error: String?,
         var data: T? = null)

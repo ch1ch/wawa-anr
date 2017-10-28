@@ -64,7 +64,7 @@ class LoginPresenterImpl @Inject constructor(private val application: WaWaApplic
             thread = EventThread.MAIN_THREAD)
     fun login(code: String) {
         Timber.d(code)
-        loginDisposable = netService.wxlogin(code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+        loginDisposable = netService.wxLogin(code).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
             if (it.code == 200 && it.data != null) {
                 val user = it.data!!
                 loginView.loginSuccess(user)

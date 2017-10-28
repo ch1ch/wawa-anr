@@ -4,7 +4,11 @@ import cn.legendream.wawa.BuildConfig
 import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.model.APIResponse
 import cn.legendream.wawa.app.model.User
+import cn.legendream.wawa.live.LiveContract
 import io.reactivex.Observable
+import io.reactivex.ObservableTransformer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -12,6 +16,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 /**
  * Author: ZhaoXiyuan
@@ -22,10 +27,20 @@ import retrofit2.http.Query
 interface NetService {
 
     @GET("user/wxLogin")
-    fun wxlogin(@Query("code") code: String): Observable<APIResponse<User>>
+    fun wxLogin(@Query("code") code: String): Observable<APIResponse<User>>
 
     @GET("order/createOrder")
-    fun createOrder(@Query("token") token: String, @Query("machineId") int: Int):Observable<APIResponse<Any>>
+    fun createOrder(@Query("token") token: String, @Query(
+        "machineId") int: Int): Observable<APIResponse<Any>>
+
+    @GET("action")
+    fun movePawTo(@Url url: String = AppInfo.GAME_URL, @Query("action") action: Int, @Query(
+        "time") time: Int = 100): Observable<APIResponse<Any>>
+
+    @GET("action")
+    fun pawCatch(@Url url: String = AppInfo.GAME_URL, @Query(
+        "action") action: Int = LiveContract.PawDirection.CATCH.direction, @Query(
+        "time") time: Int = 100): Observable<APIResponse<Any>>
 
 
     companion object {
@@ -33,16 +48,24 @@ interface NetService {
             getNetServiceInstance()
         }
 
+
+        fun <T> ioToMain(): ObservableTransformer<in APIResponse<T>, out APIResponse<T>> {
+            return ObservableTransformer { upstream ->
+                upstream.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            }
+        }
+
         private fun getNetServiceInstance(): NetService {
             val okHttp = OkHttpClient.Builder().addInterceptor(SignInterceptor())
             if (BuildConfig.DEBUG) {
-                okHttp.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                okHttp.addInterceptor(
+                    HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             }
             val retrofit = Retrofit.Builder()
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .baseUrl(AppInfo.BASE_URL).client(okHttp.build())
-                    .build()
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .baseUrl(AppInfo.BASE_URL).client(okHttp.build())
+                .build()
             return retrofit.create(NetService::class.java)
         }
     }
