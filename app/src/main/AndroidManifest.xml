@@ -31,6 +31,24 @@
             </intent-filter>
         </receiver>
 
+
+        <!-- alipay sdk begin -->
+
+        <activity
+            android:name="com.alipay.sdk.app.H5PayActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden" >
+        </activity>
+        <activity
+            android:name="com.alipay.sdk.app.H5AuthActivity"
+            android:configChanges="orientation|keyboardHidden|navigation"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden" >
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
@@ -58,6 +76,8 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".clutchrecord.CatchRecordActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".wxapi.WXPayEntryActivity" />
+        <activity android:name=".recharge.RechargeActivity" />
 
     </application>
 

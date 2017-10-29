@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity
 import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.login.LoginPresenterImpl
 import com.hwangjr.rxbus.RxBus
-import com.tencent.mm.opensdk.constants.ConstantsAPI
 import com.tencent.mm.opensdk.modelbase.BaseReq
 import com.tencent.mm.opensdk.modelbase.BaseResp
 import com.tencent.mm.opensdk.modelmsg.SendAuth

@@ -7,12 +7,16 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
 import cn.legendream.wawa.R
+import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.contract.ExtraKey
 import cn.legendream.wawa.app.extra.toast
 import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.user.UserManager
 import cn.legendream.wawa.dolldetail.DollDetailActivity
+import cn.legendream.wawa.payment.pay.OnPayFinishListener
+import cn.legendream.wawa.payment.pay.PayStatus
+import cn.legendream.wawa.payment.wxpay.WXPay
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.call.RemoteStream
@@ -28,12 +32,15 @@ import javax.inject.Inject
  */
 
 class LiveActivity : AppCompatActivity(),
-                     LiveContract.View {
+                     LiveContract.View, OnPayFinishListener {
 
     @Inject
     lateinit var mLivePresenter: LivePresenter
 
     private lateinit var machine: Machine
+    private val wxPay by lazy {
+        WXPay(this, AppInfo.WX_APP_ID)
+    }
 
     private val pawDirectionKeyListener by lazy {
         View.OnClickListener { keyView ->
@@ -100,6 +107,14 @@ class LiveActivity : AppCompatActivity(),
             intent.putExtra(ExtraKey.EXTRA_DOLL_IMAGE_URL, machine.dollImg)
             startActivity(intent)
         }
+
+        btn_doll_record.setOnClickListener {
+
+        }
+
+    }
+
+    override fun onPayFinish(payStatus: PayStatus?, message: String?) {
 
     }
 

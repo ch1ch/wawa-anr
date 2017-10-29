@@ -3,6 +3,7 @@ package cn.legendream.wawa.app.net
 import cn.legendream.wawa.BuildConfig
 import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.model.APIResponse
+import cn.legendream.wawa.app.model.GameCoinPackage
 import cn.legendream.wawa.app.model.User
 import cn.legendream.wawa.live.LiveContract
 import io.reactivex.Observable
@@ -41,6 +42,13 @@ interface NetService {
     fun pawCatch(@Url url: String = AppInfo.GAME_URL, @Query(
         "action") action: Int = LiveContract.PawDirection.CATCH.direction, @Query(
         "time") time: Int = 100): Observable<APIResponse<Any>>
+
+    @GET("order/getRechargePackage")
+    fun rechargePackageList():Observable<APIResponse<List<GameCoinPackage>>>
+
+
+    @GET("order/recharge")
+    fun rechargePayInfo(@Query("token") token: String, @Query())
 
 
     companion object {
