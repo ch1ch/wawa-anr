@@ -47,8 +47,8 @@ interface NetService {
     fun rechargePackageList():Observable<APIResponse<List<GameCoinPackage>>>
 
 
-    @GET("order/recharge")
-    fun rechargePayInfo(@Query("token") token: String, @Query())
+//    @GET("order/recharge")
+//    fun rechargePayInfo(@Query("token") token: String, @Query())
 
 
     companion object {
