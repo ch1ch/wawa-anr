@@ -49,7 +49,8 @@ public class AliPayer extends AbsPayer {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SDK_PAY_FLAG: {
-                    PayResult payResult = new PayResult((String) msg.obj);
+                    @SuppressWarnings("unchecked")
+                    PayResult payResult = new PayResult((Map<String, String>) msg.obj);
                     /**
                      * 同步返回的结果必须放置到服务端进行验证（验证的规则请看https://doc.open.alipay.com/doc2/
                      * detail.htm?spm=0.0.0.0.xdvAU6&treeId=59&articleId=103665&
@@ -86,25 +87,19 @@ public class AliPayer extends AbsPayer {
 
     @Override
     public void pay(final String payInfo) {
-        final String sign;
-        try {
-            sign = new String(Base64.decode(payInfo, Base64.DEFAULT), "GBK");
-            Runnable payRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    PayTask payTask = new PayTask(mActivity);
-                    Map<String, String> result = payTask.payV2(sign, true);
-                    Message msg = new Message();
-                    msg.what = SDK_PAY_FLAG;
-                    msg.obj = result;
-                    mHandler.sendMessage(msg);
-                }
-            };
-            Thread payThread = new Thread(payRunnable);
-            payThread.start();
-        } catch (UnsupportedEncodingException e) {
-            payFailure("支付中心数据错误");
-        }
 
+        Runnable payRunnable = new Runnable() {
+            @Override
+            public void run() {
+                PayTask payTask = new PayTask(mActivity);
+                Map<String, String> result = payTask.payV2(payInfo, true);
+                Message msg = new Message();
+                msg.what = SDK_PAY_FLAG;
+                msg.obj = result;
+                mHandler.sendMessage(msg);
+            }
+        };
+        Thread payThread = new Thread(payRunnable);
+        payThread.start();
     }
 }

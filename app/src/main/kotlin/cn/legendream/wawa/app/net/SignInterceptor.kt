@@ -13,7 +13,7 @@ class SignInterceptor : Interceptor {
         chain?.let {
             val request = chain.request()
             val url = request.url()
-            val sign = Utilis.sign(url)
+            val sign = Utils.sign(url)
             val newRequest = request.newBuilder().url(url.newBuilder().addQueryParameter("sign", sign).build()).build()
             return chain.proceed(newRequest)
         } ?: kotlin.run {

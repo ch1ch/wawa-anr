@@ -43,7 +43,7 @@ class PayRouter {
         }
     }
 
-    void payFinish(PayStatus payStatus, String message) {
+    void payFinish(@NonNull PayStatus payStatus, String message) {
         isPaying.set(false);
         if (mOnPayFinishListener != null) {
             mOnPayFinishListener.onPayFinish(payStatus, message);

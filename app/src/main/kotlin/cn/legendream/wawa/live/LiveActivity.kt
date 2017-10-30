@@ -17,6 +17,7 @@ import cn.legendream.wawa.dolldetail.DollDetailActivity
 import cn.legendream.wawa.payment.pay.OnPayFinishListener
 import cn.legendream.wawa.payment.pay.PayStatus
 import cn.legendream.wawa.payment.wxpay.WXPay
+import cn.legendream.wawa.recharge.RechargeActivity
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.call.RemoteStream
@@ -32,15 +33,12 @@ import javax.inject.Inject
  */
 
 class LiveActivity : AppCompatActivity(),
-                     LiveContract.View, OnPayFinishListener {
+                     LiveContract.View {
 
     @Inject
     lateinit var mLivePresenter: LivePresenter
 
     private lateinit var machine: Machine
-    private val wxPay by lazy {
-        WXPay(this, AppInfo.WX_APP_ID)
-    }
 
     private val pawDirectionKeyListener by lazy {
         View.OnClickListener { keyView ->
@@ -102,21 +100,19 @@ class LiveActivity : AppCompatActivity(),
         move_left.setOnClickListener(pawDirectionKeyListener)
         move_right.setOnClickListener(pawDirectionKeyListener)
 
-        btn_doll_detail.setOnClickListener{
+        btn_doll_detail.setOnClickListener {
             val intent = Intent(this@LiveActivity, DollDetailActivity::class.java)
             intent.putExtra(ExtraKey.EXTRA_DOLL_IMAGE_URL, machine.dollImg)
             startActivity(intent)
         }
 
         btn_doll_record.setOnClickListener {
-
+            val intent = Intent(this@LiveActivity, RechargeActivity::class.java)
+            startActivity(intent)
         }
 
     }
 
-    override fun onPayFinish(payStatus: PayStatus?, message: String?) {
-
-    }
 
     private fun showLiveControllerPanel() {
         video_view.visibility = View.VISIBLE

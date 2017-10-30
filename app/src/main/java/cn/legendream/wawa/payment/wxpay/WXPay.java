@@ -2,9 +2,9 @@ package cn.legendream.wawa.payment.wxpay;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import com.kokozu.cias.core.pay.AbsPayer;
-import com.kokozu.cias.core.pay.PayManager;
-import com.kokozu.cias.core.pay.Payment;
+import cn.legendream.wawa.payment.pay.AbsPayer;
+import cn.legendream.wawa.payment.pay.PayManager;
+import cn.legendream.wawa.payment.pay.Payment;
 
 /**
  * Author: ZhaoXiyuan

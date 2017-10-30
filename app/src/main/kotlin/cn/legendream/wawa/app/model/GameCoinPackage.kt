@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName
 
 
 data class GameCoinPackage(
-    @SerializedName("id") var id: Int = 0, //1
+    @SerializedName("id") var id: String = "", //1
     @SerializedName("packageName") var packageName: String = "", //100 游戏币
     @SerializedName("packageUrl") var packageUrl: String = "", //null
     @SerializedName("price") var price: Int = 0, //10
@@ -22,7 +22,7 @@ data class GameCoinPackage(
     @SerializedName("createTime") var createTime: String = "" //2017-09-11 22:06:18
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readInt(),
+        parcel.readString(),
         parcel.readString(),
         parcel.readString(),
         parcel.readInt(),
@@ -32,7 +32,7 @@ data class GameCoinPackage(
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(id)
+        parcel.writeString(id)
         parcel.writeString(packageName)
         parcel.writeString(packageUrl)
         parcel.writeInt(price)

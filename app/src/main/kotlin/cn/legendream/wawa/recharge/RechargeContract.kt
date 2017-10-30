@@ -11,13 +11,14 @@ import cn.legendream.wawa.app.model.GameCoinPackage
 interface RechargeContract {
 
     interface View {
-        fun showPackageList(packageList: MutableList<GameCoinPackage>)
+        fun showPackageList(packageList: List<GameCoinPackage>)
+        fun fetchPackageListFailure(error: String)
         fun startPay(payInfo: String)
         fun fetchPayInfoFailure(error: String)
     }
 
     interface Presenter {
         fun packageList()
-        fun fetchPayInfo()
+        fun fetchPayInfo(packageId: String)
     }
 }

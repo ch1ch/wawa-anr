@@ -12,7 +12,7 @@ import java.util.*
 
 private val simpleDateFormat: SimpleDateFormat = SimpleDateFormat("yyyy#MM#ddHH:mm", Locale.getDefault())
 
-class Utilis {
+class Utils {
     companion object {
         fun sign(url: HttpUrl): String {
             val param = StringBuilder()

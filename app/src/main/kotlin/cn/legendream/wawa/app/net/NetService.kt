@@ -44,11 +44,13 @@ interface NetService {
         "time") time: Int = 100): Observable<APIResponse<Any>>
 
     @GET("order/getRechargePackage")
-    fun rechargePackageList():Observable<APIResponse<List<GameCoinPackage>>>
+    fun rechargePackageList(): Observable<APIResponse<List<GameCoinPackage>>>
 
 
-//    @GET("order/recharge")
-//    fun rechargePayInfo(@Query("token") token: String, @Query())
+    @GET("order/recharge")
+    fun rechargePayInfo(@Query("token") token: String, @Query(
+        "packageId") packageId: String, @Query("payType") payType: Int, @Query(
+        "outPayOrder") outPayOrder: String): Observable<APIResponse<String>>
 
 
     companion object {
