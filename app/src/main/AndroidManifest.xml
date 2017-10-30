@@ -78,6 +78,7 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".wxapi.WXPayEntryActivity" />
         <activity android:name=".recharge.RechargeActivity" />
+        <activity android:name=".live.TestActivity" />
 
     </application>
 

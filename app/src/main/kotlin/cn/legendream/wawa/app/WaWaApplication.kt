@@ -31,7 +31,7 @@ class WaWaApplication : Application() {
 
     private fun initDillDog() {
         val options = WilddogOptions.Builder().setSyncUrl(
-                "https://wd2620361786fgzrcs.wilddogio.com").build()
+                "http://wd2620361786fgzrcs.wilddogio.com").build()
         WilddogApp.initializeApp(this, options)
         WilddogAuth.getInstance().signInAnonymously().addOnCompleteListener { task ->
             kotlin.run {

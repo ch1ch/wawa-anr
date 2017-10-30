@@ -1,5 +1,6 @@
 package cn.legendream.wawa.live
 
+import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.net.NetService
 import cn.legendream.wawa.app.net.NetServiceCode
 import cn.legendream.wawa.app.user.UserManager
@@ -121,7 +122,8 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun movePawTo(pawDirection: LiveContract.PawDirection) {
-        netService.movePawTo(action = pawDirection.direction).compose(NetService.ioToMain()).subscribe({
+        netService.movePawTo(AppInfo.GAME_URL + "/action", pawDirection.direction, 100).compose(
+            NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
                 liveView.movePawFailure(pawDirection, it.error.toString())
             } else {
@@ -133,7 +135,8 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun clutch() {
-        netService.pawCatch().compose(NetService.ioToMain()).subscribe({
+        netService.pawCatch(AppInfo.GAME_URL+ "/action", LiveContract.PawDirection.CATCH.direction,
+            100).compose(NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
                 liveView.movePawFailure(LiveContract.PawDirection.CATCH, it.error.toString())
             } else {
