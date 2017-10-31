@@ -23,7 +23,7 @@ class TestActivity:AppCompatActivity() {
 
     private val localStream by lazy {
         val localStreamOptionsBuilder = LocalStreamOptions.Builder()
-//        localStreamOptionsBuilder.captureAudio(true).captureVideo(true)
+        localStreamOptionsBuilder.captureAudio(false).captureVideo(false)
         val opt = localStreamOptionsBuilder.build()
         LocalStream.create(opt)
     }
@@ -37,7 +37,7 @@ class TestActivity:AppCompatActivity() {
         val video = WilddogVideoCall.getInstance()
 
 //        val conversation = video.call("", localStream, "test")
-        conversation = video.call("c491223b1c259d63e040a08f34a0", localStream, "conversationDemo")
+        conversation = video.call("e3f46b825c763fdf49acb2c94863", localStream, "conversationDemo")
         conversation?.setConversationListener(object : Conversation.Listener {
             override fun onStreamReceived(p0: RemoteStream?) {
                 Timber.d("onStreamReceived")

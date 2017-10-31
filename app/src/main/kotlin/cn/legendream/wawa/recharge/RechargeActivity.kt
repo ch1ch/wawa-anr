@@ -73,7 +73,10 @@ class RechargeActivity : AppCompatActivity(),
 
     override fun onPayFinish(payStatus: PayStatus, message: String?) {
         when (payStatus) {
-            PayStatus.SUCCESS -> toast("支付成功")
+            PayStatus.SUCCESS -> kotlin.run {
+                toast("支付成功")
+                finish()
+            }
             PayStatus.CANCEL -> toast("取消支付")
             PayStatus.FAILURE -> toast("支付失败")
         }

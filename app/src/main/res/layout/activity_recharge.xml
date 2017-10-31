@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/img_login_bg">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_package_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_height="wrap_content"
+        android:minHeight="400dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="72dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="72dp"
+        android:paddingBottom="48dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="32dp"
+        android:background="@drawable/ic_recharge_list_bg"
+        android:overScrollMode="never"/>
 
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>

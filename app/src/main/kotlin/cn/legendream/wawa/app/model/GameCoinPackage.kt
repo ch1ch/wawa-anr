@@ -16,8 +16,8 @@ data class GameCoinPackage(
     @SerializedName("id") var id: String = "", //1
     @SerializedName("packageName") var packageName: String = "", //100 游戏币
     @SerializedName("packageUrl") var packageUrl: String = "", //null
-    @SerializedName("price") var price: Int = 0, //10
-    @SerializedName("gameMoney") var gameMoney: Int = 0, //100
+    @SerializedName("price") var price: String = "", //10
+    @SerializedName("gameMoney") var gameMoney: String = "", //100
     @SerializedName("status") var status: Int = 0, //1
     @SerializedName("createTime") var createTime: String = "" //2017-09-11 22:06:18
 ) : Parcelable {
@@ -25,8 +25,8 @@ data class GameCoinPackage(
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
-        parcel.readInt(),
-        parcel.readInt(),
+        parcel.readString(),
+        parcel.readString(),
         parcel.readInt(),
         parcel.readString()) {
     }
@@ -35,8 +35,8 @@ data class GameCoinPackage(
         parcel.writeString(id)
         parcel.writeString(packageName)
         parcel.writeString(packageUrl)
-        parcel.writeInt(price)
-        parcel.writeInt(gameMoney)
+        parcel.writeString(price)
+        parcel.writeString(gameMoney)
         parcel.writeInt(status)
         parcel.writeString(createTime)
     }

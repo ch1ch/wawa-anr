@@ -29,6 +29,7 @@ class RechargePackagetAdapter : RecyclerView.Adapter<RechargePackagetAdapter.Rec
         val coilPackage = rechargePackageList?.get(position)
         coilPackage?.let {
             holder.itemView.tv_package_name.text = coilPackage.packageName
+            holder.itemView.tv_package_price.text = "￥ ${coilPackage.price} 元"
             holder.itemView.setOnClickListener {
                 onClickPackageListener?.onClickPackage(coilPackage)
             }

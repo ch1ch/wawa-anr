@@ -23,7 +23,7 @@ import javax.inject.Inject
 class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                                         private val netService: NetService) : LiveContract.Presenter {
 
-    private val localStream by lazy {
+    private val _localStream by lazy {
         val localStreamOptionsBuilder = LocalStreamOptions.Builder()
         localStreamOptionsBuilder.captureAudio(true).captureVideo(true)
         val opt = localStreamOptionsBuilder.build()
@@ -31,7 +31,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     private var waitGame = false
-
+    private var localStream: LocalStream? = null
     private var syncRef: SyncReference? = null
     private var conversation: Conversation? = null
     private val user by lazy {
@@ -96,6 +96,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         val video = WilddogVideoCall.getInstance()
 
 //        val conversation = video.call(videoId, localStream, "test")
+        localStream = _localStream
         conversation = video.call(videoId, localStream, "test")
         conversation?.setConversationListener(object : Conversation.Listener {
             override fun onStreamReceived(p0: RemoteStream?) {
@@ -135,7 +136,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun clutch() {
-        netService.pawCatch(AppInfo.GAME_URL+ "/action", LiveContract.PawDirection.CATCH.direction,
+        netService.pawCatch(AppInfo.GAME_URL + "/action", LiveContract.PawDirection.CATCH.direction,
             100).compose(NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
                 liveView.movePawFailure(LiveContract.PawDirection.CATCH, it.error.toString())
@@ -148,8 +149,9 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun destroy() {
-//      localStream.detach()
-// remoteStream?.detach()
+        Timber.d("Live stop ")
+        localStream?.detach()
+        remoteStream?.detach()
         conversation?.close()
         conversation = null
     }

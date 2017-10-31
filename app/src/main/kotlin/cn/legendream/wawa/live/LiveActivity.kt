@@ -74,11 +74,12 @@ class LiveActivity : AppCompatActivity(),
 
         start_game.setOnClickListener {
             Timber.d("start game")
-//            video_view.release()
-//            showGameControllerPanel()
+
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
 
             // TODO: 此处为演示切换视频源 请注意检查实际逻辑
+//            video_view.release()
+//            showGameControllerPanel()
 //            mLivePresenter.startGameVideo(machine.video1 ?: "")
         }
 
