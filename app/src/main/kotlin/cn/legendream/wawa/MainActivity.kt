@@ -1,5 +1,6 @@
 package cn.legendream.wawa
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -12,18 +13,19 @@ import android.widget.Toast
 import butterknife.ButterKnife
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.contract.ExtraKey
+import cn.legendream.wawa.app.extra.toast
 import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.model.User
 import cn.legendream.wawa.app.user.UserManager
 import cn.legendream.wawa.live.LiveActivity
-import cn.legendream.wawa.live.TestActivity
 import cn.legendream.wawa.login.LoginActivity
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), MainContract.MainView {
+class MainActivity : AppCompatActivity(),
+                     MainContract.MainView {
 
     @Inject
     lateinit var mainPresenter: MainPresenterImpl
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     private var loginFinish = true
     private var user: User? = null
     private var callJSFinish = false
+    private var wildDogSuccess = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +45,10 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         ButterKnife.bind(this)
         initView()
         mainPresenter.checkLogin()
+        mainPresenter.loginWildDog()
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun initView() {
         web_view.webViewClient = WaWaWebViewClient()
         web_view.webChromeClient = WaWaWebChromeClient()
@@ -111,6 +116,15 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         }
     }
 
+    override fun wildDogSuccess() {
+        wildDogSuccess = true
+    }
+
+    override fun wildDogFailure(error: String) {
+        toast(error)
+        finish()
+    }
+
     inner class WaWaWebChromeClient : WebChromeClient()
 
     inner class WaWaJsInterface {
@@ -119,12 +133,18 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
             Timber.d(roomJson)
             val machine = Gson().fromJson(roomJson, Machine::class.java)
             if (machine != null) {
-                val intent = Intent(this@MainActivity, LiveActivity::class.java)
-                intent.putExtra(ExtraKey.EXTRA_MACHINE, machine)
-                startActivity(intent)
+                if (wildDogSuccess) {
+                    val intent = Intent(this@MainActivity, LiveActivity::class.java)
+                    intent.putExtra(ExtraKey.EXTRA_MACHINE, machine)
+                    startActivity(intent)
+//                    val intent = Intent(this@MainActivity, TestActivity::class.java)
+//                    startActivity(intent)
+
+                } else {
+                    toast("正在连接服务器，请稍后...")
+                }
 
 //                val intent = Intent(this@MainActivity, TestActivity::class.java)
-//
             }
 
         }

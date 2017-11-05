@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8"/>
+        app:layout_constraintGuide_percent="0.8" />
 
     <FrameLayout
         android:id="@+id/video_container"
@@ -29,23 +29,38 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:visibility="visible"/>
+            android:visibility="visible" />
 
         <com.wilddog.video.base.WilddogVideoView
             android:id="@+id/wild_dog_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </FrameLayout>
+
+    <Button
+        android:id="@+id/btn_switch_video"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="20dp"
+        android:background="#a3DB485A"
+        android:text="切换视角"
+        android:textColor="@color/md_white_1000"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline_controller"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.65"/>
+        app:layout_constraintGuide_percent="0.65" />
 
     <ImageView
         android:id="@+id/iv_video_controller_bg"
@@ -56,7 +71,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guideline_controller"/>
+        app:layout_constraintTop_toTopOf="@id/guideline_controller" />
 
     <ImageView
         android:id="@+id/start_game"
@@ -65,7 +80,7 @@
         android:src="@drawable/ic_start_game"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"/>
+        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg" />
 
     <ImageView
         android:id="@+id/iv_charge"
@@ -75,7 +90,18 @@
         android:src="@drawable/ic_my_coin"
         app:layout_constraintBottom_toBottomOf="@id/start_game"
         app:layout_constraintLeft_toLeftOf="@id/start_game"
-        app:layout_constraintRight_toRightOf="@id/start_game"/>
+        app:layout_constraintRight_toRightOf="@id/start_game" />
+
+    <TextView
+        android:id="@+id/tv_coin_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="32dp"
+        android:textColor="@color/md_white_1000"
+        app:layout_constraintBottom_toBottomOf="@id/iv_charge"
+        app:layout_constraintRight_toRightOf="@id/iv_charge"
+        app:layout_constraintTop_toTopOf="@id/iv_charge"
+        tools:text="100" />
 
 
     <FrameLayout
@@ -86,7 +112,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <ImageView
             android:id="@+id/move_up"
@@ -94,7 +120,7 @@
             android:layout_height="70dp"
             android:layout_gravity="center_horizontal"
             android:scaleType="center"
-            android:src="@drawable/ic_catch_up"/>
+            android:src="@drawable/ic_catch_up" />
 
         <ImageView
             android:id="@+id/move_down"
@@ -102,7 +128,7 @@
             android:layout_height="70dp"
             android:layout_gravity="center_horizontal|bottom"
             android:scaleType="center"
-            android:src="@drawable/ic_catch_down"/>
+            android:src="@drawable/ic_catch_down" />
 
         <ImageView
             android:id="@+id/move_left"
@@ -110,7 +136,7 @@
             android:layout_height="70dp"
             android:layout_gravity="center_vertical|left"
             android:scaleType="center"
-            android:src="@drawable/ic_catch_left"/>
+            android:src="@drawable/ic_catch_left" />
 
         <ImageView
             android:id="@+id/move_right"
@@ -118,7 +144,7 @@
             android:layout_height="70dp"
             android:layout_gravity="center_vertical|right"
             android:scaleType="center"
-            android:src="@drawable/ic_catch_right"/>
+            android:src="@drawable/ic_catch_right" />
     </FrameLayout>
 
     <ImageView
@@ -132,7 +158,7 @@
         android:visibility="gone"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
 
     <android.support.v7.widget.AppCompatButton
@@ -143,7 +169,7 @@
         android:background="@color/colorPrimary"
         android:text="娃娃详情"
         android:textColor="@color/md_white_1000"
-        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg"/>
+        app:layout_constraintTop_toTopOf="@id/iv_video_controller_bg" />
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/btn_doll_record"
@@ -153,6 +179,6 @@
         android:background="@color/colorPrimary"
         android:text="抓取记录"
         android:textColor="@color/md_white_1000"
-        app:layout_constraintTop_toBottomOf="@id/btn_doll_detail"/>
+        app:layout_constraintTop_toBottomOf="@id/btn_doll_detail" />
 
 </android.support.constraint.ConstraintLayout>

@@ -12,9 +12,12 @@ interface MainContract {
     interface MainView {
         fun haveLogin(user: User)
         fun noLogin()
+        fun wildDogSuccess()
+        fun wildDogFailure(error: String)
     }
 
     interface MainPresenter {
         fun checkLogin()
+        fun loginWildDog()
     }
 }

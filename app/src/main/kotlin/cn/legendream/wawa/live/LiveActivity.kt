@@ -7,17 +7,15 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
 import cn.legendream.wawa.R
-import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.contract.ExtraKey
 import cn.legendream.wawa.app.extra.toast
 import cn.legendream.wawa.app.model.Machine
+import cn.legendream.wawa.app.model.User
 import cn.legendream.wawa.app.user.UserManager
 import cn.legendream.wawa.dolldetail.DollDetailActivity
-import cn.legendream.wawa.payment.pay.OnPayFinishListener
-import cn.legendream.wawa.payment.pay.PayStatus
-import cn.legendream.wawa.payment.wxpay.WXPay
 import cn.legendream.wawa.recharge.RechargeActivity
+import com.afollestad.materialdialogs.MaterialDialog
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.call.RemoteStream
@@ -35,10 +33,21 @@ import javax.inject.Inject
 class LiveActivity : AppCompatActivity(),
                      LiveContract.View {
 
+
     @Inject
     lateinit var mLivePresenter: LivePresenter
 
     private lateinit var machine: Machine
+    private val user by lazy {
+        UserManager.getUser()
+    }
+
+    private val noticeDialog by lazy {
+        MaterialDialog.Builder(this).content("等待开始").progress(false, 5, true).positiveText(
+            "开始游戏").onPositive({ dialog, which ->
+            mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
+        }).cancelable(false).build()
+    }
 
     private val pawDirectionKeyListener by lazy {
         View.OnClickListener { keyView ->
@@ -92,7 +101,7 @@ class LiveActivity : AppCompatActivity(),
             } else { //  直播 切换至 游戏中
                 video_view.release()
                 showGameControllerPanel()
-                mLivePresenter.startGameVideo(machine.video1 ?: "")
+                mLivePresenter.startGameVideo(machine.video1 ?: "", machine.video2 ?: "")
             }
         }
 
@@ -107,11 +116,16 @@ class LiveActivity : AppCompatActivity(),
             startActivity(intent)
         }
 
-        btn_doll_record.setOnClickListener {
+        iv_charge.setOnClickListener {
             val intent = Intent(this@LiveActivity, RechargeActivity::class.java)
             startActivity(intent)
         }
 
+        btn_switch_video.setOnClickListener {
+            mLivePresenter.switchGameVideo()
+        }
+
+        tv_coin_balance.text = user?.gameMoney.toString()
     }
 
 
@@ -120,6 +134,7 @@ class LiveActivity : AppCompatActivity(),
         wild_dog_view.visibility = View.GONE
         start_game.visibility = View.VISIBLE
         iv_charge.visibility = View.VISIBLE
+        tv_coin_balance.visibility = View.VISIBLE
         lay_game_controller.visibility = View.GONE
         btn_catch.visibility = View.GONE
 
@@ -132,11 +147,22 @@ class LiveActivity : AppCompatActivity(),
         iv_charge.visibility = View.GONE
         lay_game_controller.visibility = View.VISIBLE
         btn_catch.visibility = View.VISIBLE
+        tv_coin_balance.visibility = View.GONE
 
+    }
+
+    override fun updateUserInfo(user: User) {
+        tv_coin_balance.text = user.gameMoney.toString()
+    }
+
+
+    override fun updateUserInfoFailure(error: String) {
+        toast(error)
     }
 
     override fun onResume() {
         super.onResume()
+        mLivePresenter.refreshUserInfo()
         video_view.onVideoResume()
     }
 
@@ -165,27 +191,43 @@ class LiveActivity : AppCompatActivity(),
         Timber.d("startGame: ")
         video_view.release()
         showGameControllerPanel()
-        mLivePresenter.startGameVideo(machine.video1 ?: "")
+        mLivePresenter.startGameVideo(machine.video1 ?: "", machine.video2 ?: "")
     }
+
 
     override fun waitGame() {
         Timber.d("waitGame: ")
         toast("排队中...   请稍后.....", Toast.LENGTH_LONG)
     }
 
-    override fun finishWait() {
+    override fun finishWait(waitTime: Int) {
         Timber.d("wait end. startGame: ")
-        startGame()
+        if (!isFinishing && !noticeDialog.isShowing) {
+            noticeDialog.setContent("等待开始游戏")
+            noticeDialog.setProgress(waitTime)
+            noticeDialog.show()
+        }
+
+        if (!isFinishing && noticeDialog.isShowing) {
+            noticeDialog.setProgress(waitTime)
+        }
     }
 
     override fun crateOrderError(error: String) {
         toast(error)
     }
 
-    override fun showGameVideo(remoteStream: RemoteStream) {
+    override fun showGameVideo1(remoteStream: RemoteStream) {
 //        wild_dog_view.visibility = View.VISIBLE
         Timber.d("show game video")
         toast("show game video")
+        remoteStream.attach(wild_dog_view)
+        btn_switch_video.visibility = View.VISIBLE
+    }
+
+    override fun showGameVideo2(remoteStream: RemoteStream) {
+        Timber.d("show game video2")
+        toast("show game video2")
         remoteStream.attach(wild_dog_view)
     }
 

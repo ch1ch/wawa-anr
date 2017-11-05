@@ -29,6 +29,9 @@ interface NetService {
     @GET("user/wxLogin")
     fun wxLogin(@Query("code") code: String): Observable<APIResponse<User>>
 
+    @GET("user/getUserInfo")
+    fun userInfo(@Query("token") token: String): Observable<APIResponse<User>>
+
     @GET("order/createOrder")
     fun createOrder(@Query("token") token: String, @Query(
         "machineId") int: Int): Observable<APIResponse<Any>>
