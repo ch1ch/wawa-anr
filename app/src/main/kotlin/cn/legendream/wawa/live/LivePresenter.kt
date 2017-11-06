@@ -39,14 +39,16 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     private var localStream: LocalStream? = null
     private var syncRef: SyncReference? = null
     private var conversation: Conversation? = null
-    private var conversation2: Conversation? = null
     private val user by lazy {
         UserManager.getUser()
     }
 
     private var remoteStream: RemoteStream? = null
-    private var remoteStream2: RemoteStream? = null
-    private var currentRemoteStream: RemoteStream? = null
+    private var currentVideoUrl: String = ""
+    private var video1: String = ""
+    private var video2: String = ""
+    private var retryVideoEstablishCount = 0
+
 
     private val valueEventListener by lazy {
         object : ValueEventListener {
@@ -133,78 +135,13 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun startGameVideo(video1: String, video2: String) {
-        Timber.d("prepare video by $video1")
-        val video = WilddogVideoCall.getInstance()
+        if (!currentVideoUrl.isEmpty()) return
 
-//        val conversation = video.call(videoId, localStream, "test")
-        localStream = _localStream
-        conversation = video.call(video1, localStream, "test")
-        conversation?.setConversationListener(object : Conversation.Listener {
-            override fun onStreamReceived(p0: RemoteStream?) {
-                Timber.d("onStreamReceived---1")
-                if (p0 != null) {
-                    remoteStream = p0
-                    remoteStream?.enableAudio(false)
-                    liveView.showGameVideo1(p0)
-//                    startVideo2(_localStream, video2)
-                }
-            }
-
-            override fun onClosed() {
-                Timber.d("onClosed")
-            }
-
-            override fun onCallResponse(p0: CallStatus?) {
-                Timber.d("onCallResponse ${p0.toString()}")
-            }
-
-            override fun onError(p0: WilddogVideoError?) {
-                Timber.d("onError")
-            }
-        })
-
-        conversation?.setStatsListener(object :Conversation.StatsListener {
-            override fun onLocalStreamStatsReport(p0: LocalStreamStatsReport?) {
-            }
-
-            override fun onRemoteStreamStatsReport(remoteStreamStatsReport: RemoteStreamStatsReport?) {
-                 Timber.d("width " + remoteStreamStatsReport?.width.toString())
-                 Timber.d("height "+remoteStreamStatsReport?.height.toString())
-                 Timber.d("fps " +remoteStreamStatsReport?.fps.toString())
-                 Timber.d("bytesReceived "+remoteStreamStatsReport?.bytesReceived.toString())
-                 Timber.d("bitsReceived " + remoteStreamStatsReport?.bitsReceivedRate.toString())
-                 Timber.d("delay " + remoteStreamStatsReport?.delay.toString())
-            }
-        })
+        this.video1 = video1
+        this.video2 = video2
+        switchGameVideo()
     }
 
-    private fun startVideo2(localStream: LocalStream, video2: String) {
-        val video = WilddogVideoCall.getInstance()
-        conversation2 = video.call(video2, localStream, "test")
-        conversation2?.setConversationListener(object : Conversation.Listener {
-            override fun onStreamReceived(p0: RemoteStream?) {
-                Timber.d("onStreamReceived---2")
-                if (p0 != null) {
-                    remoteStream2 = p0
-                    remoteStream2?.enableAudio(false)
-//                    liveView.showGameVideo2(p0)
-                }
-            }
-
-            override fun onClosed() {
-                Timber.d("onClosed 2")
-            }
-
-            override fun onCallResponse(p0: CallStatus?) {
-                Timber.d("onCallResponse ${p0.toString()}")
-            }
-
-            override fun onError(p0: WilddogVideoError?) {
-                Timber.d("onError")
-            }
-        })
-
-    }
 
     override fun movePawTo(pawDirection: LiveContract.PawDirection) {
         netService.movePawTo(AppInfo.GAME_URL + "/action", pawDirection.direction, 100).compose(
@@ -233,36 +170,79 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun switchGameVideo() {
-        if (currentRemoteStream == remoteStream) {
-            Timber.d("switch to 2")
-            remoteStream?.detach()
-            if (remoteStream2 != null) {
-                liveView.showGameVideo2(remoteStream2!!)
-            }
-            currentRemoteStream = remoteStream2
-            return
+        wildDogDestroy()
+        currentVideoUrl = when {
+            currentVideoUrl.isEmpty() -> video1
+            currentVideoUrl == video1 -> video2
+            else -> video1
         }
-
-        if (currentRemoteStream == remoteStream2) {
-            Timber.d("switch to 1")
-
-            remoteStream2?.detach()
-            if (remoteStream != null) {
-                liveView.showGameVideo1(remoteStream!!)
-            }
-            currentRemoteStream = remoteStream
-        }
+        startVideo(currentVideoUrl)
     }
 
-    override fun destroy() {
+    private fun startVideo(videoUrl: String) {
+        Timber.d("prepare video by $currentVideoUrl")
+        val video = WilddogVideoCall.getInstance()
+
+//        val conversation = video.call(videoId, localStream, "test")
+        localStream = _localStream
+        conversation = video.call(currentVideoUrl, localStream, "test")
+        conversation?.setConversationListener(object : Conversation.Listener {
+            override fun onStreamReceived(p0: RemoteStream?) {
+                Timber.d("onStreamReceived---1")
+                if (p0 != null) {
+                    remoteStream = p0
+                    remoteStream?.enableAudio(false)
+                    liveView.showGameVideo(p0)
+                }
+                retryVideoEstablishCount = 0
+
+            }
+
+            override fun onClosed() {
+                Timber.d("onClosed")
+                retryVideoEstablishCount = 0
+
+            }
+
+            override fun onCallResponse(p0: CallStatus?) {
+                if (p0 == CallStatus.TIMEOUT && retryVideoEstablishCount < 3) {
+                    retryVideoEstablishCount++
+                    wildDogDestroy()
+                    startVideo(videoUrl)
+                } else {
+                    retryVideoEstablishCount = 0
+                }
+                Timber.d("onCallResponse ${p0.toString()} $retryVideoEstablishCount")
+            }
+
+            override fun onError(p0: WilddogVideoError?) {
+                Timber.d("onError")
+                retryVideoEstablishCount = 0
+            }
+        })
+
+        conversation?.setStatsListener(object : Conversation.StatsListener {
+            override fun onLocalStreamStatsReport(p0: LocalStreamStatsReport?) {
+            }
+
+            override fun onRemoteStreamStatsReport(
+                remoteStreamStatsReport: RemoteStreamStatsReport?) {
+                Timber.d("width " + remoteStreamStatsReport?.width.toString())
+                Timber.d("height " + remoteStreamStatsReport?.height.toString())
+                Timber.d("fps " + remoteStreamStatsReport?.fps.toString())
+                Timber.d("bytesReceived " + remoteStreamStatsReport?.bytesReceived.toString())
+                Timber.d("bitsReceived " + remoteStreamStatsReport?.bitsReceivedRate.toString())
+                Timber.d("delay " + remoteStreamStatsReport?.delay.toString())
+            }
+        })
+    }
+
+    override fun wildDogDestroy() {
         Timber.d("Live stop ")
-        localStream?.detach()
+//        localStream?.detach()
         remoteStream?.detach()
-        remoteStream2?.detach()
         conversation?.close()
-        conversation2?.close()
         conversation = null
-        conversation2 = null
     }
 
 }

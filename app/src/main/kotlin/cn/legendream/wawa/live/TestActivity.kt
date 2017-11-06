@@ -37,14 +37,14 @@ class TestActivity:AppCompatActivity() {
         val video = WilddogVideoCall.getInstance()
 
 //        val conversation = video.call("", localStream, "test")
-        conversation = video.call("08cb326eccb320ca7c7c202cce43", localStream, "conversationDemo")
+        conversation = video.call("0b224702a551798f1fcffa5f3ed9", localStream, "conversationDemo")
         conversation?.setConversationListener(object : Conversation.Listener {
             override fun onStreamReceived(p0: RemoteStream?) {
                 Timber.d("onStreamReceived")
                 if (p0 != null) {
 //                    remoteStream = p0
 //                    remoteStream?.enableAudio(false)
-//                    liveView.showGameVideo1(p0)
+//                    liveView.showGameVideo(p0)
                     p0.attach(wild_dog_view)
                 }
             }

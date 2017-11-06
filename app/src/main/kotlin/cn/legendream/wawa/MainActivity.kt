@@ -18,6 +18,7 @@ import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.model.User
 import cn.legendream.wawa.app.user.UserManager
 import cn.legendream.wawa.live.LiveActivity
+import cn.legendream.wawa.live.TestActivity
 import cn.legendream.wawa.login.LoginActivity
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*

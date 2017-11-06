@@ -14,8 +14,7 @@ interface LiveContract {
         fun waitGame()
         fun finishWait(waitTime: Int)
         fun crateOrderError(error: String)
-        fun showGameVideo1(remoteStream: RemoteStream)
-        fun showGameVideo2(remoteStream: RemoteStream)
+        fun showGameVideo(remoteStream: RemoteStream)
         fun showLocalVideo(localStream: LocalStream)
         fun movePawSuccess(direction: PawDirection)
         fun movePawFailure(direction: PawDirection, error: String)
@@ -33,7 +32,7 @@ interface LiveContract {
         fun movePawTo(pawDirection: PawDirection)
         fun clutch()
         fun switchGameVideo()
-        fun destroy()
+        fun wildDogDestroy()
     }
 
     enum class PawDirection(val direction: Int) {

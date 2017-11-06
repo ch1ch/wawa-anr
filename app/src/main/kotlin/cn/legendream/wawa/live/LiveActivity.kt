@@ -85,6 +85,7 @@ class LiveActivity : AppCompatActivity(),
             Timber.d("start game")
 
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
+//            finishWait(2)
 
             // TODO: 此处为演示切换视频源 请注意检查实际逻辑
 //            video_view.release()
@@ -217,7 +218,7 @@ class LiveActivity : AppCompatActivity(),
         toast(error)
     }
 
-    override fun showGameVideo1(remoteStream: RemoteStream) {
+    override fun showGameVideo(remoteStream: RemoteStream) {
 //        wild_dog_view.visibility = View.VISIBLE
         Timber.d("show game video")
         toast("show game video")
@@ -225,11 +226,6 @@ class LiveActivity : AppCompatActivity(),
         btn_switch_video.visibility = View.VISIBLE
     }
 
-    override fun showGameVideo2(remoteStream: RemoteStream) {
-        Timber.d("show game video2")
-        toast("show game video2")
-        remoteStream.attach(wild_dog_view)
-    }
 
     override fun showLocalVideo(localStream: LocalStream) {
         Timber.d("show local video")
@@ -248,7 +244,7 @@ class LiveActivity : AppCompatActivity(),
     override fun pawCatchSuccess() {
         Timber.d("Paw clutch success. ")
         showLiveControllerPanel()
-        mLivePresenter.destroy()
+        mLivePresenter.wildDogDestroy()
         video_view.startPlayLogic()
     }
 
@@ -259,7 +255,7 @@ class LiveActivity : AppCompatActivity(),
 
     override fun onStop() {
         super.onStop()
-        mLivePresenter.destroy()
+        mLivePresenter.wildDogDestroy()
     }
 
 }
