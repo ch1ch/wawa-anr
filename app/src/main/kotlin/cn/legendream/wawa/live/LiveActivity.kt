@@ -138,6 +138,9 @@ class LiveActivity : AppCompatActivity(),
         tv_coin_balance.visibility = View.VISIBLE
         lay_game_controller.visibility = View.GONE
         btn_catch.visibility = View.GONE
+        tv_game_down_time.visibility = View.GONE
+        btn_switch_video.visibility = View.GONE
+
 
     }
 
@@ -149,7 +152,8 @@ class LiveActivity : AppCompatActivity(),
         lay_game_controller.visibility = View.VISIBLE
         btn_catch.visibility = View.VISIBLE
         tv_coin_balance.visibility = View.GONE
-
+        tv_game_down_time.visibility = View.VISIBLE
+        btn_switch_video.visibility = View.VISIBLE
     }
 
     override fun updateUserInfo(user: User) {
@@ -176,6 +180,7 @@ class LiveActivity : AppCompatActivity(),
     override fun onDestroy() {
         super.onDestroy()
         video_view.release()
+        mLivePresenter.destroy()
     }
 
     override fun onBackPressed() {
@@ -195,6 +200,13 @@ class LiveActivity : AppCompatActivity(),
         mLivePresenter.startGameVideo(machine.video1 ?: "", machine.video2 ?: "")
     }
 
+    override fun updateGameTime(time: Long) {
+        tv_game_down_time.text = time.toString()
+    }
+
+    override fun gameTimeIsOver() {
+        mLivePresenter.clutch()
+    }
 
     override fun waitGame() {
         Timber.d("waitGame: ")
@@ -203,6 +215,11 @@ class LiveActivity : AppCompatActivity(),
 
     override fun finishWait(waitTime: Int) {
         Timber.d("wait end. startGame: ")
+
+        if (!isFinishing && waitTime > 5) {
+            noticeDialog.dismiss()
+        }
+
         if (!isFinishing && !noticeDialog.isShowing) {
             noticeDialog.setContent("等待开始游戏")
             noticeDialog.setProgress(waitTime)
@@ -250,12 +267,16 @@ class LiveActivity : AppCompatActivity(),
 
     override fun pawCatchFailure(error: String) {
         Timber.d("Paw clutch Failure. $error")
-
+        toast(error)
+        showLiveControllerPanel()
+        mLivePresenter.wildDogDestroy()
+        video_view.startPlayLogic()
     }
 
     override fun onStop() {
         super.onStop()
         mLivePresenter.wildDogDestroy()
     }
+
 
 }

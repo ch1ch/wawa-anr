@@ -1,5 +1,6 @@
 package cn.legendream.wawa.live
 
+import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.model.User
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.call.RemoteStream
@@ -22,6 +23,8 @@ interface LiveContract {
         fun pawCatchFailure(error: String)
         fun updateUserInfo(user: User)
         fun updateUserInfoFailure(error: String)
+        fun updateGameTime(time: Long)
+        fun gameTimeIsOver()
     }
 
 
@@ -29,10 +32,11 @@ interface LiveContract {
         fun refreshUserInfo()
         fun createOrder(machineId: Int, token: String)
         fun startGameVideo(video1: String, video2: String)
-        fun movePawTo(pawDirection: PawDirection)
-        fun clutch()
+        fun movePawTo(machine: Machine, pawDirection: PawDirection)
+        fun clutch(machine: Machine)
         fun switchGameVideo()
         fun wildDogDestroy()
+        fun destroy()
     }
 
     enum class PawDirection(val direction: Int) {

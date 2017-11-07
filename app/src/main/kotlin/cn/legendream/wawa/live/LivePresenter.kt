@@ -1,6 +1,8 @@
 package cn.legendream.wawa.live
 
+import android.os.CountDownTimer
 import cn.legendream.wawa.app.AppInfo
+import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.net.NetService
 import cn.legendream.wawa.app.net.NetServiceCode
 import cn.legendream.wawa.app.user.UserManager
@@ -48,6 +50,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     private var video1: String = ""
     private var video2: String = ""
     private var retryVideoEstablishCount = 0
+    private var gameTimer: GameDownTime? = null
 
 
     private val valueEventListener by lazy {
@@ -61,19 +64,18 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                 if (p0?.exists() == true) {
                     if (waitGame) {
                         @Suppress("UNCHECKED_CAST")
-                        val userIdList = p0.value as ArrayList<Long?>
-                        val userId = userIdList.find {
-                            user?.id == it?.toInt() ?: -1
-                        }
-                        if (userId == null) {
-                            waitGame = false
-                            startGameDownTime()
-                            syncRef?.removeEventListener(this)
+                        val userIdList = p0.value as? ArrayList<Long?>
+                        if (userIdList != null && userIdList.size > 1) {
+                            if ((userIdList[1] ?: -1) == user?.id?.toLong() ?: 0) {
+                                waitGame = false
+                                startWaitGameDownTime()
+                                syncRef?.removeEventListener(this)
+                            }
                         }
                     }
                 } else {
                     waitGame = false
-                    startGameDownTime()
+                    startWaitGameDownTime()
                     syncRef?.removeEventListener(this)
                 }
             }
@@ -81,13 +83,20 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
 
-    private fun startGameDownTime() {
+    private fun startWaitGameDownTime() {
         Observable.intervalRange(1, 6, 0, 1, TimeUnit.SECONDS).observeOn(
             AndroidSchedulers.mainThread()).subscribe {
             Timber.d(it.toString())
             liveView.finishWait(it.toInt())
         }
     }
+
+    private fun startGameDownTime() {
+        gameTimer?.cancel()
+        gameTimer = GameDownTime()
+        gameTimer?.start()
+    }
+
 
     override fun createOrder(machineId: Int, token: String) {
         netService.createOrder(token, machineId).compose(NetService.ioToMain()).subscribe({
@@ -96,6 +105,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                 it.code == NetServiceCode.NORMAL.code -> kotlin.run {
                     waitGame = false
                     liveView.startGame()
+                    startGameDownTime()
                 }
                 it.code == NetServiceCode.PUT_USER_LINE.code -> {
                     waitGame = true
@@ -143,8 +153,8 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
 
-    override fun movePawTo(pawDirection: LiveContract.PawDirection) {
-        netService.movePawTo(AppInfo.GAME_URL + "/action", pawDirection.direction, 100).compose(
+    override fun movePawTo(machine: Machine, pawDirection: LiveContract.PawDirection) {
+        netService.movePawTo("http://${machine.ipAddress}/action", pawDirection.direction, 100).compose(
             NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
                 liveView.movePawFailure(pawDirection, it.error.toString())
@@ -156,11 +166,11 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         })
     }
 
-    override fun clutch() {
-        netService.pawCatch(AppInfo.GAME_URL + "/action", LiveContract.PawDirection.CATCH.direction,
+    override fun clutch(machine: Machine) {
+        netService.pawCatch("http://${machine.ipAddress}/action", LiveContract.PawDirection.CATCH.direction,
             100).compose(NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
-                liveView.movePawFailure(LiveContract.PawDirection.CATCH, it.error.toString())
+                liveView.pawCatchFailure(it.error.toString())
             } else {
                 liveView.pawCatchSuccess()
             }
@@ -243,6 +253,21 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         remoteStream?.detach()
         conversation?.close()
         conversation = null
+    }
+
+    override fun destroy() {
+        gameTimer?.cancel()
+        gameTimer = null
+    }
+
+    inner class GameDownTime : CountDownTimer(5_000, 1_000) {
+        override fun onTick(p0: Long) {
+            liveView.updateGameTime(p0 / 1_000)
+        }
+
+        override fun onFinish() {
+            liveView.gameTimeIsOver()
+        }
     }
 
 }
