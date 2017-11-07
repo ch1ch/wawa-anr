@@ -52,10 +52,10 @@ class LiveActivity : AppCompatActivity(),
     private val pawDirectionKeyListener by lazy {
         View.OnClickListener { keyView ->
             when (keyView.id) {
-                R.id.move_up -> mLivePresenter.movePawTo(LiveContract.PawDirection.UP)
-                R.id.move_down -> mLivePresenter.movePawTo(LiveContract.PawDirection.DOWN)
-                R.id.move_left -> mLivePresenter.movePawTo(LiveContract.PawDirection.LEFT)
-                R.id.move_right -> mLivePresenter.movePawTo(LiveContract.PawDirection.RIGHT)
+                R.id.move_up -> mLivePresenter.movePawTo(machine, LiveContract.PawDirection.UP)
+                R.id.move_down -> mLivePresenter.movePawTo(machine,LiveContract.PawDirection.DOWN)
+                R.id.move_left -> mLivePresenter.movePawTo(machine,LiveContract.PawDirection.LEFT)
+                R.id.move_right -> mLivePresenter.movePawTo(machine,LiveContract.PawDirection.RIGHT)
             }
         }
     }
@@ -97,7 +97,7 @@ class LiveActivity : AppCompatActivity(),
             Timber.d("start game video")
             if (wild_dog_view.visibility == View.VISIBLE) { //游戏中 切换至 直播
 
-                mLivePresenter.clutch()
+                mLivePresenter.clutch(machine)
 
             } else { //  直播 切换至 游戏中
                 video_view.release()
@@ -205,7 +205,7 @@ class LiveActivity : AppCompatActivity(),
     }
 
     override fun gameTimeIsOver() {
-        mLivePresenter.clutch()
+        mLivePresenter.clutch(machine)
     }
 
     override fun waitGame() {
