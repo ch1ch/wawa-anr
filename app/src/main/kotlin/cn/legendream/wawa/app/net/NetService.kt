@@ -4,6 +4,7 @@ import cn.legendream.wawa.BuildConfig
 import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.model.APIResponse
 import cn.legendream.wawa.app.model.GameCoinPackage
+import cn.legendream.wawa.app.model.Order
 import cn.legendream.wawa.app.model.User
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
@@ -34,7 +35,7 @@ interface NetService {
 
     @GET("order/createOrder")
     fun createOrder(@Query("token") token: String, @Query(
-        "machineId") int: Int): Observable<APIResponse<Any>>
+        "machineId") int: Int): Observable<APIResponse<String>>
 
     @GET
     fun movePawTo(@Url url: String, @Query("action") action: Int, @Query(
@@ -53,6 +54,8 @@ interface NetService {
         "packageId") packageId: String, @Query("payType") payType: Int, @Query(
         "outPayOrder") outPayOrder: String): Observable<APIResponse<String>>
 
+    @GET("order/getOrderById")
+    fun queryOrderInfo(@Query("orderId") orderId: String): Observable<APIResponse<Order>>
 
     companion object {
         val INSTANCE: NetService by lazy {

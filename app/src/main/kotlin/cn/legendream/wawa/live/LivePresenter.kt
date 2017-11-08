@@ -1,7 +1,6 @@
 package cn.legendream.wawa.live
 
 import android.os.CountDownTimer
-import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.model.Machine
 import cn.legendream.wawa.app.net.NetService
 import cn.legendream.wawa.app.net.NetServiceCode
@@ -18,6 +17,7 @@ import com.wilddog.video.call.stats.LocalStreamStatsReport
 import com.wilddog.video.call.stats.RemoteStreamStatsReport
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -51,6 +51,8 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     private var video2: String = ""
     private var retryVideoEstablishCount = 0
     private var gameTimer: GameDownTime? = null
+    private var waitGameTimerDisposable: Disposable? = null
+    private var retryCheckOrderCount = 0
 
 
     private val valueEventListener by lazy {
@@ -84,7 +86,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
 
 
     private fun startWaitGameDownTime() {
-        Observable.intervalRange(1, 6, 0, 1, TimeUnit.SECONDS).observeOn(
+        waitGameTimerDisposable = Observable.intervalRange(1, 6, 0, 1, TimeUnit.SECONDS).observeOn(
             AndroidSchedulers.mainThread()).subscribe {
             Timber.d(it.toString())
             liveView.finishWait(it.toInt())
@@ -99,12 +101,14 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
 
 
     override fun createOrder(machineId: Int, token: String) {
+        waitGameTimerDisposable?.dispose()
+        waitGameTimerDisposable = null
         netService.createOrder(token, machineId).compose(NetService.ioToMain()).subscribe({
             Timber.d("createOrder: $it")
             when {
                 it.code == NetServiceCode.NORMAL.code -> kotlin.run {
                     waitGame = false
-                    liveView.startGame()
+                    liveView.startGame(it.data ?: "")
                     startGameDownTime()
                 }
                 it.code == NetServiceCode.PUT_USER_LINE.code -> {
@@ -154,7 +158,8 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
 
 
     override fun movePawTo(machine: Machine, pawDirection: LiveContract.PawDirection) {
-        netService.movePawTo("http://${machine.ipAddress}/action", pawDirection.direction, 100).compose(
+        netService.movePawTo("http://${machine.ipAddress}/action", pawDirection.direction,
+            100).compose(
             NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
                 liveView.movePawFailure(pawDirection, it.error.toString())
@@ -167,7 +172,8 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun clutch(machine: Machine) {
-        netService.pawCatch("http://${machine.ipAddress}/action", LiveContract.PawDirection.CATCH.direction,
+        netService.pawCatch("http://${machine.ipAddress}/action",
+            LiveContract.PawDirection.CATCH.direction,
             100).compose(NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
                 liveView.pawCatchFailure(it.error.toString())
@@ -177,6 +183,52 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         }, {
             liveView.pawCatchFailure(it.message.toString())
         })
+    }
+
+
+    override fun checkGameResult(orderId: String) {
+
+        netService.queryOrderInfo(orderId).compose(
+            NetService.ioToMain()).subscribe({
+            when {
+                it.code == NetServiceCode.NORMAL.code -> {
+                    Timber.d(it.data.toString())
+                    when (it.data?.status ?: -1) {
+                        1 -> {
+                            if (retryCheckOrderCount < 3) {
+                                checkGameResult(orderId)
+                                retryCheckOrderCount++
+                            } else {
+                                liveView.clutchFailure("抓取结果查询失败")
+                                retryCheckOrderCount = 0
+                            }
+
+                        }
+                        2 -> {
+                            liveView.clutchFailure("未抓到")
+                        }
+                        3 -> {
+                            liveView.clutchSuccess("抓取成功")
+                        }
+                        else -> {
+                            liveView.clutchFailure("抓取结构查询失败")
+                        }
+                    }
+                }
+            }
+        }, {
+            Timber.d(it.message)
+            liveView.clutchFailure("抓取结构查询失败")
+            retryCheckOrderCount = 0
+        })
+
+    }
+
+    class Test :Comparable<Number> {
+        override fun compareTo(other: Number): Int {
+            return 1
+        }
+
     }
 
     override fun switchGameVideo() {

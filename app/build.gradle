@@ -9,7 +9,6 @@ android {
     compileSdkVersion 27
     buildToolsVersion "26.0.2"
     defaultConfig {
-        applicationId "cn.legendream.wawa"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
@@ -49,6 +48,28 @@ android {
         }
     }
 
+    flavorDimensions "all"
+
+    productFlavors {
+        eFun {
+            applicationId "cn.legendream.wawa"
+            resValue("string", "app_name", "eFun 抓娃娃")
+            buildConfigField("String", "WX_APPID", "\"wx6a80112f66ba9cd9\"")
+            buildConfigField("String", "H5_HOME", "\"http://wawa.legendream.cn/#/home\"")
+            dimension "all"
+        }
+
+        mmj {
+//            applicationId "cn.legendream.wawa"
+            applicationId "cn.legendream.mmj"
+            resValue("string", "app_name", "喵喵酱")
+            buildConfigField("String", "WX_APPID", "\"wx5944f493a1c43a95\"")
+//            buildConfigField("String", "WX_APPID", "\"wx6a80112f66ba9cd9\"")
+            buildConfigField("String", "H5_HOME", "\"http://wawatest.legendream.cn/#/home\"")
+            dimension "all"
+        }
+    }
+
 
     lintOptions {
         // checkReleaseBuilds false
@@ -57,8 +78,8 @@ android {
         abortOnError false
     }
 
-    repositories{
-        flatDir{
+    repositories {
+        flatDir {
             dirs 'libs'
         }
     }
@@ -95,11 +116,11 @@ dependencies {
         exclude group: 'com.jakewharton.timber', module: 'timber'
     }
     implementation 'com.shuyu:GSYVideoPlayer:2.1.0'
-    implementation ('com.wilddog.client:wilddog-sync-android:2.3.7') {
-        exclude group: 'org.json', module :'json'
+    implementation('com.wilddog.client:wilddog-sync-android:2.3.7') {
+        exclude group: 'org.json', module: 'json'
     }
-    implementation ('com.wilddog.client:wilddog-auth-android:2.0.7') {
-        exclude group: 'org.json', module :'json'
+    implementation('com.wilddog.client:wilddog-auth-android:2.0.7') {
+        exclude group: 'org.json', module: 'json'
     }
     implementation 'com.wilddog.client:wilddog-video-call-android:2.2.2'
     implementation 'com.github.bumptech.glide:glide:4.2.0'

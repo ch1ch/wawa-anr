@@ -11,6 +11,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import butterknife.ButterKnife
+import cn.legendream.wawa.app.AppInfo
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.contract.ExtraKey
 import cn.legendream.wawa.app.extra.toast
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity(),
         web_view.settings.domStorageEnabled = true
         web_view.settings.setAppCacheEnabled(true)
         web_view.addJavascriptInterface(WaWaJsInterface(), "androidApp")
-        web_view.loadUrl("http://wawa.legendream.cn/#/home")
+        web_view.loadUrl(AppInfo.H5_HOME)
     }
 
     override fun haveLogin(user: User) {

@@ -19,6 +19,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.call.RemoteStream
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_live.*
 import kotlinx.android.synthetic.main.empty_control_video.view.*
 import timber.log.Timber
@@ -38,9 +39,11 @@ class LiveActivity : AppCompatActivity(),
     lateinit var mLivePresenter: LivePresenter
 
     private lateinit var machine: Machine
+    private var orderId: String? = null
     private val user by lazy {
         UserManager.getUser()
     }
+
 
     private val noticeDialog by lazy {
         MaterialDialog.Builder(this).content("等待开始").progress(false, 5, true).positiveText(
@@ -53,9 +56,10 @@ class LiveActivity : AppCompatActivity(),
         View.OnClickListener { keyView ->
             when (keyView.id) {
                 R.id.move_up -> mLivePresenter.movePawTo(machine, LiveContract.PawDirection.UP)
-                R.id.move_down -> mLivePresenter.movePawTo(machine,LiveContract.PawDirection.DOWN)
-                R.id.move_left -> mLivePresenter.movePawTo(machine,LiveContract.PawDirection.LEFT)
-                R.id.move_right -> mLivePresenter.movePawTo(machine,LiveContract.PawDirection.RIGHT)
+                R.id.move_down -> mLivePresenter.movePawTo(machine, LiveContract.PawDirection.DOWN)
+                R.id.move_left -> mLivePresenter.movePawTo(machine, LiveContract.PawDirection.LEFT)
+                R.id.move_right -> mLivePresenter.movePawTo(machine,
+                    LiveContract.PawDirection.RIGHT)
             }
         }
     }
@@ -193,7 +197,8 @@ class LiveActivity : AppCompatActivity(),
         }, 500)
     }
 
-    override fun startGame() {
+    override fun startGame(orderId: String) {
+        this.orderId = orderId
         Timber.d("startGame: ")
         video_view.release()
         showGameControllerPanel()
@@ -214,16 +219,18 @@ class LiveActivity : AppCompatActivity(),
     }
 
     override fun finishWait(waitTime: Int) {
-        Timber.d("wait end. startGame: ")
+        Timber.d("wait end. startGame: $waitTime")
 
         if (!isFinishing && waitTime > 5) {
             noticeDialog.dismiss()
+            return
         }
 
         if (!isFinishing && !noticeDialog.isShowing) {
             noticeDialog.setContent("等待开始游戏")
             noticeDialog.setProgress(waitTime)
             noticeDialog.show()
+            return
         }
 
         if (!isFinishing && noticeDialog.isShowing) {
@@ -263,6 +270,10 @@ class LiveActivity : AppCompatActivity(),
         showLiveControllerPanel()
         mLivePresenter.wildDogDestroy()
         video_view.startPlayLogic()
+        val currentOrder = orderId
+        if (currentOrder != null) {
+            mLivePresenter.checkGameResult(currentOrder)
+        }
     }
 
     override fun pawCatchFailure(error: String) {
@@ -273,10 +284,17 @@ class LiveActivity : AppCompatActivity(),
         video_view.startPlayLogic()
     }
 
+    override fun clutchSuccess(message: String) {
+        toast(message)
+    }
+
+    override fun clutchFailure(error: String) {
+        toast(error)
+    }
+
     override fun onStop() {
         super.onStop()
         mLivePresenter.wildDogDestroy()
     }
-
 
 }

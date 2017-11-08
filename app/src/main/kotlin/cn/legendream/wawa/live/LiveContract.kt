@@ -11,7 +11,7 @@ import com.wilddog.video.call.RemoteStream
 
 interface LiveContract {
     interface View {
-        fun startGame()
+        fun startGame(orderId: String)
         fun waitGame()
         fun finishWait(waitTime: Int)
         fun crateOrderError(error: String)
@@ -25,6 +25,8 @@ interface LiveContract {
         fun updateUserInfoFailure(error: String)
         fun updateGameTime(time: Long)
         fun gameTimeIsOver()
+        fun clutchSuccess(message: String)
+        fun clutchFailure(error: String)
     }
 
 
@@ -37,6 +39,7 @@ interface LiveContract {
         fun switchGameVideo()
         fun wildDogDestroy()
         fun destroy()
+        fun checkGameResult(orderId: String)
     }
 
     enum class PawDirection(val direction: Int) {
