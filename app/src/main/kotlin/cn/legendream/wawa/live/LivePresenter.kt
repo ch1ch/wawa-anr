@@ -106,7 +106,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         netService.createOrder(token, machineId).compose(NetService.ioToMain()).subscribe({
             Timber.d("createOrder: $it")
             when {
-                it.code == NetServiceCode.NORMAL.code -> kotlin.run {
+                (it.code == NetServiceCode.NORMAL.code || it.code == NetServiceCode.USER_HAS_STARTED.code) -> kotlin.run {
                     waitGame = false
                     liveView.startGame(it.data ?: "")
                     startGameDownTime()
@@ -172,6 +172,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun clutch(machine: Machine) {
+        currentVideoUrl = ""
         netService.pawCatch("http://${machine.ipAddress}/action",
             LiveContract.PawDirection.CATCH.direction,
             100).compose(NetService.ioToMain()).subscribe({
@@ -221,13 +222,6 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
             liveView.clutchFailure("抓取结构查询失败")
             retryCheckOrderCount = 0
         })
-
-    }
-
-    class Test :Comparable<Number> {
-        override fun compareTo(other: Number): Int {
-            return 1
-        }
 
     }
 
@@ -312,7 +306,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         gameTimer = null
     }
 
-    inner class GameDownTime : CountDownTimer(5_000, 1_000) {
+    inner class GameDownTime : CountDownTimer(60_000, 1_000) {
         override fun onTick(p0: Long) {
             liveView.updateGameTime(p0 / 1_000)
         }

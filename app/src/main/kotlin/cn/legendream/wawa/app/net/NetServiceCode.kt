@@ -17,5 +17,6 @@ enum class NetServiceCode(val code: Int, val message: String) {
     BACK_ORDER_ERROR(4002, "回调订单失败"),
     PACKAGE_ERROR(4003, "无效的充值套餐"),
     PUT_USER_LINE(4004, "已经加入当前机器排位，前位玩家结束后再游戏下单"),
+    USER_HAS_STARTED(4005, "已经是当前玩家，请开始游戏"),
     LTS_ERROR(5001, "LTS错误")
 }
