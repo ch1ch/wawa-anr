@@ -11,7 +11,7 @@ import cn.legendream.wawa.BuildConfig
 class AppInfo {
     companion object {
         const val WX_APP_ID = BuildConfig.WX_APPID
-        const val BASE_URL = "http://47.94.236.45:9000"
+        const val BASE_URL = BuildConfig.BASE_URL
         const val H5_HOME = BuildConfig.H5_HOME
     }
 }
