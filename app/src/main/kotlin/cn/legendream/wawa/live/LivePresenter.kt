@@ -114,6 +114,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                 }
                 it.code == NetServiceCode.PUT_USER_LINE.code -> {
                     waitGame = true
+                    liveView.hideLoading()
                     liveView.waitGame()
                     syncRef = WilddogSync.getInstance().getReference("$machineId")
                     syncRef?.addValueEventListener(valueEventListener)
