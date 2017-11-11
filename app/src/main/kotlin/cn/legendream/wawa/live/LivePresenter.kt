@@ -217,18 +217,18 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                                 retryCheckOrderCount++
                             } else {
                                 liveView.hideLoading()
-                                liveView.clutchDollFailure("抓取结果查询失败")
+                                liveView.clutchDollFailure("额... 什么也没查到...")
                                 retryCheckOrderCount = 0
                             }
 
                         }
                         2 -> {
                             liveView.hideLoading()
-                            liveView.clutchDollFailure("未抓到")
+                            liveView.clutchDollFailure("好遗憾，没抓到...")
                         }
                         3 -> {
                             liveView.hideLoading()
-                            liveView.clutchDollSuccess("抓取成功")
+                            liveView.clutchDollSuccess("我的天，抓到了！！！")
                         }
                         else -> {
                             liveView.hideLoading()

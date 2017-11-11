@@ -11,6 +11,7 @@ import cn.legendream.wawa.payment.alipay.AliPay
 import cn.legendream.wawa.payment.pay.OnPayFinishListener
 import cn.legendream.wawa.payment.pay.PayManager
 import cn.legendream.wawa.payment.pay.PayStatus
+import com.afollestad.materialdialogs.MaterialDialog
 import kotlinx.android.synthetic.main.activity_recharge.*
 import javax.inject.Inject
 
@@ -74,10 +75,26 @@ class RechargeActivity : AppCompatActivity(),
     override fun onPayFinish(payStatus: PayStatus, message: String?) {
         when (payStatus) {
             PayStatus.SUCCESS -> kotlin.run {
-                toast("支付成功")
-                finish()
+                if (!isFinishing) {
+                    MaterialDialog.Builder(this).content("支付成功").positiveText(
+                        "好的").dismissListener {
+                        finish()
+                    }.build().show()
+                } else {
+                    finish()
+                }
             }
-            PayStatus.CANCEL -> toast("取消支付")
+            PayStatus.CANCEL ->  {
+                if (!isFinishing) {
+                    MaterialDialog.Builder(this).content("支付成功").positiveText(
+                        "好的").dismissListener {
+                        finish()
+                    }.build().show()
+                } else {
+                    finish()
+                }
+                toast("取消支付")
+            }
             PayStatus.FAILURE -> toast("支付失败")
         }
     }

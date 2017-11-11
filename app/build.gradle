@@ -54,9 +54,10 @@ android {
         eFun {
             applicationId "cn.legendream.wawa"
             resValue("string", "app_name", "eFun 抓娃娃")
-            buildConfigField("String", "WX_APPID", "\"wx6a80112f66ba9cd9\"")
+            buildConfigField("String", "WX_APPID", "\"wx9a7d6224ec489554\"")
             buildConfigField("String", "H5_HOME", "\"http://wawa.legendream.cn/#/home\"")
             buildConfigField("String", "BASE_URL", "\"http://47.94.236.45:9000\"")
+            buildConfigField("String", "TERM_URL", "\"http://wawa.legendream.cn/xieyi.html\"")
             dimension "all"
         }
 
@@ -66,9 +67,9 @@ android {
             resValue("string", "app_name", "喵喵酱")
             buildConfigField("String", "WX_APPID", "\"wx5944f493a1c43a95\"")
 //            buildConfigField("String", "WX_APPID", "\"wx6a80112f66ba9cd9\"")
-            buildConfigField("String", "H5_HOME", "\"http://wawatest.legendream.cn/#/home\"")
+            buildConfigField("String", "H5_HOME", "\"http://miao.legendream.cn/#/home\"")
             buildConfigField("String", "BASE_URL", "\"http://47.94.236.45:9900\"")
-
+            buildConfigField("String", "TERM_URL", "\" http://miao.legendream.cn/xieyi.html\"")
             dimension "all"
         }
     }

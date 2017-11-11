@@ -10,6 +10,7 @@ import butterknife.OnClick
 import cn.legendream.wawa.R
 import cn.legendream.wawa.app.WaWaApplication
 import cn.legendream.wawa.app.model.User
+import cn.legendream.wawa.web.WebActivity
 import javax.inject.Inject
 
 class LoginActivity : AppCompatActivity(), LoginContract.loginView {
@@ -28,6 +29,12 @@ class LoginActivity : AppCompatActivity(), LoginContract.loginView {
     @OnClick(R.id.btn_wx_login)
     fun wxLogin() {
         mLoginPresenter.weChatLogin()
+    }
+
+    @OnClick(R.id.btn_term)
+    fun gotoTerm() {
+        val intent = Intent(this, WebActivity::class.java)
+        startActivity(intent)
     }
 
     override fun loginSuccess(user: User) {
