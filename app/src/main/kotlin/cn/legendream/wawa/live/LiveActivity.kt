@@ -19,7 +19,6 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
 import com.wilddog.video.base.LocalStream
 import com.wilddog.video.call.RemoteStream
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_live.*
 import kotlinx.android.synthetic.main.empty_control_video.view.*
 import timber.log.Timber
@@ -33,7 +32,6 @@ import javax.inject.Inject
 
 class LiveActivity : AppCompatActivity(),
                      LiveContract.View {
-
 
     @Inject
     lateinit var mLivePresenter: LivePresenter
@@ -50,6 +48,10 @@ class LiveActivity : AppCompatActivity(),
             "开始游戏").onPositive({ dialog, which ->
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
         }).cancelable(false).build()
+    }
+
+    private val progressDialg by lazy {
+        MaterialDialog.Builder(this).content("加载中").progress(true, 0).cancelable(false).build()
     }
 
     private val pawDirectionKeyListener by lazy {
@@ -101,7 +103,7 @@ class LiveActivity : AppCompatActivity(),
             Timber.d("start game video")
             if (wild_dog_view.visibility == View.VISIBLE) { //游戏中 切换至 直播
 
-                mLivePresenter.clutch(machine)
+                mLivePresenter.catch(machine)
 
             } else { //  直播 切换至 游戏中
                 video_view.release()
@@ -210,7 +212,7 @@ class LiveActivity : AppCompatActivity(),
     }
 
     override fun gameTimeIsOver() {
-        mLivePresenter.clutch(machine)
+        mLivePresenter.catch(machine)
     }
 
     override fun waitGame() {
@@ -265,8 +267,16 @@ class LiveActivity : AppCompatActivity(),
 
     }
 
-    override fun pawCatchSuccess() {
-        Timber.d("Paw clutch success. ")
+    override fun pawDownSuccess() {
+        toast("请稍等... 即将为你查询结果...")
+    }
+
+    override fun pawDownFailure(error: String) {
+        toast(error)
+    }
+
+    override fun pawCatchFinish() {
+        Timber.d("Paw catch success. ")
         showLiveControllerPanel()
         mLivePresenter.wildDogDestroy()
         video_view.startPlayLogic()
@@ -277,19 +287,40 @@ class LiveActivity : AppCompatActivity(),
     }
 
     override fun pawCatchFailure(error: String) {
-        Timber.d("Paw clutch Failure. $error")
+        Timber.d("Paw catch Failure. $error")
         toast(error)
         showLiveControllerPanel()
         mLivePresenter.wildDogDestroy()
         video_view.startPlayLogic()
     }
 
-    override fun clutchSuccess(message: String) {
-        toast(message)
+    override fun showLoading(message: String) {
+        if (!isFinishing) {
+            progressDialg.setContent(message)
+            if (!progressDialg.isShowing) {
+                progressDialg.show()
+            }
+        }
     }
 
-    override fun clutchFailure(error: String) {
-        toast(error)
+    override fun hideLoading() {
+        if (!isFinishing) {
+            progressDialg.dismiss()
+        }
+    }
+
+    override fun clutchDollSuccess(message: String) {
+        if (!isFinishing) {
+            MaterialDialog.Builder(this).title("本局结果").content(message).positiveText(
+                "开心 ^_^").build().show()
+        }
+    }
+
+    override fun clutchDollFailure(error: String) {
+        if (!isFinishing) {
+            MaterialDialog.Builder(this).title("本局结果").content(error).positiveText(
+                "蓝瘦，香菇").build().show()
+        }
     }
 
     override fun onStop() {

@@ -53,6 +53,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     private var gameTimer: GameDownTime? = null
     private var waitGameTimerDisposable: Disposable? = null
     private var retryCheckOrderCount = 0
+    private var gameVideoDelayDisposable: Disposable? = null
 
 
     private val valueEventListener by lazy {
@@ -99,10 +100,10 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         gameTimer?.start()
     }
 
-
     override fun createOrder(machineId: Int, token: String) {
         waitGameTimerDisposable?.dispose()
         waitGameTimerDisposable = null
+        liveView.showLoading("正在为你创建订单...")
         netService.createOrder(token, machineId).compose(NetService.ioToMain()).subscribe({
             Timber.d("createOrder: $it")
             when {
@@ -118,10 +119,14 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                     syncRef?.addValueEventListener(valueEventListener)
                     SyncReference.goOnline()
                 }
-                else -> liveView.crateOrderError(it.error.toString())
+                else -> {
+                    liveView.crateOrderError(it.error.toString())
+                    liveView.hideLoading()
+                }
             }
         }, {
             it.printStackTrace()
+            liveView.hideLoading()
             liveView.crateOrderError(it.message.toString())
         }
         )
@@ -149,6 +154,8 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     }
 
     override fun startGameVideo(video1: String, video2: String) {
+        liveView.showLoading("正在为你接通视频...")
+
         if (!currentVideoUrl.isEmpty()) return
 
         this.video1 = video1
@@ -171,25 +178,34 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
         })
     }
 
-    override fun clutch(machine: Machine) {
+    override fun catch(machine: Machine) {
         currentVideoUrl = ""
         netService.pawCatch("http://${machine.ipAddress}/action",
             LiveContract.PawDirection.CATCH.direction,
             100).compose(NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
-                liveView.pawCatchFailure(it.error.toString())
+                liveView.pawDownFailure(it.error.toString())
             } else {
-                liveView.pawCatchSuccess()
+                liveView.hideLoading()
+                liveView.pawDownSuccess()
+                pawCatchFinish()
             }
         }, {
-            liveView.pawCatchFailure(it.message.toString())
+            liveView.pawDownFailure(it.message.toString())
+
         })
     }
 
+    private fun pawCatchFinish() {
+        gameVideoDelayDisposable = Observable.timer(5, TimeUnit.SECONDS).observeOn(
+            AndroidSchedulers.mainThread()).subscribe {
+            liveView.pawCatchFinish()
+        }
+    }
 
     override fun checkGameResult(orderId: String) {
-
-        netService.queryOrderInfo(orderId).compose(
+        liveView.showLoading("正在为你检查抓取结果...")
+        netService.queryOrderInfo(orderId).delay(3, TimeUnit.SECONDS).compose(
             NetService.ioToMain()).subscribe({
             when {
                 it.code == NetServiceCode.NORMAL.code -> {
@@ -200,26 +216,30 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                                 checkGameResult(orderId)
                                 retryCheckOrderCount++
                             } else {
-                                liveView.clutchFailure("抓取结果查询失败")
+                                liveView.hideLoading()
+                                liveView.clutchDollFailure("抓取结果查询失败")
                                 retryCheckOrderCount = 0
                             }
 
                         }
                         2 -> {
-                            liveView.clutchFailure("未抓到")
+                            liveView.hideLoading()
+                            liveView.clutchDollFailure("未抓到")
                         }
                         3 -> {
-                            liveView.clutchSuccess("抓取成功")
+                            liveView.hideLoading()
+                            liveView.clutchDollSuccess("抓取成功")
                         }
                         else -> {
-                            liveView.clutchFailure("抓取结构查询失败")
+                            liveView.hideLoading()
+                            liveView.clutchDollFailure("抓取结构查询失败")
                         }
                     }
                 }
             }
         }, {
             Timber.d(it.message)
-            liveView.clutchFailure("抓取结构查询失败")
+            liveView.clutchDollFailure("抓取结构查询失败")
             retryCheckOrderCount = 0
         })
 
@@ -249,6 +269,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
                     remoteStream = p0
                     remoteStream?.enableAudio(false)
                     liveView.showGameVideo(p0)
+                    liveView.hideLoading()
                 }
                 retryVideoEstablishCount = 0
 
@@ -257,15 +278,16 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
             override fun onClosed() {
                 Timber.d("onClosed")
                 retryVideoEstablishCount = 0
-
+                liveView.hideLoading()
             }
 
             override fun onCallResponse(p0: CallStatus?) {
-                if (p0 == CallStatus.TIMEOUT && retryVideoEstablishCount < 3) {
+                if ((p0 != CallStatus.ACCEPTED) && retryVideoEstablishCount < 2) {
                     retryVideoEstablishCount++
                     wildDogDestroy()
                     startVideo(videoUrl)
                 } else {
+                    liveView.hideLoading()
                     retryVideoEstablishCount = 0
                 }
                 Timber.d("onCallResponse ${p0.toString()} $retryVideoEstablishCount")
@@ -273,6 +295,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
 
             override fun onError(p0: WilddogVideoError?) {
                 Timber.d("onError")
+                liveView.hideLoading()
                 retryVideoEstablishCount = 0
             }
         })
@@ -304,6 +327,10 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
     override fun destroy() {
         gameTimer?.cancel()
         gameTimer = null
+        syncRef?.removeEventListener(valueEventListener)
+        gameVideoDelayDisposable?.dispose()
+        waitGameTimerDisposable?.dispose()
+        SyncReference.goOffline()
     }
 
     inner class GameDownTime : CountDownTimer(60_000, 1_000) {

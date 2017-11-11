@@ -19,14 +19,18 @@ interface LiveContract {
         fun showLocalVideo(localStream: LocalStream)
         fun movePawSuccess(direction: PawDirection)
         fun movePawFailure(direction: PawDirection, error: String)
-        fun pawCatchSuccess()
+        fun pawDownSuccess() //下抓成功
+        fun pawDownFailure(error: String) //下抓失败
+        fun pawCatchFinish() // 抓取结束
         fun pawCatchFailure(error: String)
         fun updateUserInfo(user: User)
         fun updateUserInfoFailure(error: String)
         fun updateGameTime(time: Long)
         fun gameTimeIsOver()
-        fun clutchSuccess(message: String)
-        fun clutchFailure(error: String)
+        fun clutchDollSuccess(message: String) //订单成功
+        fun clutchDollFailure(error: String)//订单失败
+        fun showLoading(message: String)
+        fun hideLoading()
     }
 
 
@@ -35,7 +39,7 @@ interface LiveContract {
         fun createOrder(machineId: Int, token: String)
         fun startGameVideo(video1: String, video2: String)
         fun movePawTo(machine: Machine, pawDirection: PawDirection)
-        fun clutch(machine: Machine)
+        fun catch(machine: Machine)
         fun switchGameVideo()
         fun wildDogDestroy()
         fun destroy()
