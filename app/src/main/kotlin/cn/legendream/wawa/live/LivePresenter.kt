@@ -185,15 +185,18 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
             LiveContract.PawDirection.CATCH.direction,
             100).compose(NetService.ioToMain()).subscribe({
             if (it.code != NetServiceCode.NORMAL.code) {
+                gameTimer?.cancel()
                 liveView.pawDownFailure(it.error.toString())
             } else {
+                gameTimer?.cancel()
+
                 liveView.hideLoading()
                 liveView.pawDownSuccess()
                 pawCatchFinish()
             }
         }, {
+            gameTimer?.cancel()
             liveView.pawDownFailure(it.message.toString())
-
         })
     }
 
