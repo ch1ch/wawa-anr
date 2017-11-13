@@ -32,7 +32,7 @@ class LivePresenter @Inject constructor(private val liveView: LiveContract.View,
 
     private val _localStream by lazy {
         val localStreamOptionsBuilder = LocalStreamOptions.Builder()
-        localStreamOptionsBuilder.captureAudio(true).captureVideo(true)
+        localStreamOptionsBuilder.captureAudio(false).captureVideo(false)
         val opt = localStreamOptionsBuilder.build()
         LocalStream.create(opt)
     }

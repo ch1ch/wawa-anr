@@ -1,5 +1,6 @@
 package cn.legendream.wawa.live
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -41,11 +42,14 @@ class LiveActivity : AppCompatActivity(),
     private val user by lazy {
         UserManager.getUser()
     }
+//    private val rxPermission by lazy {
+//        RxPermissions(this)
+//    }
 
 
     private val noticeDialog by lazy {
         MaterialDialog.Builder(this).content("等待开始").progress(false, 5, true).positiveText(
-            "开始游戏").onPositive({ dialog, which ->
+            "开始游戏").onPositive({ _, _ ->
             mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
         }).cancelable(false).build()
     }
@@ -80,7 +84,7 @@ class LiveActivity : AppCompatActivity(),
             (application as WaWaApplication).getAppComponent()).liveModule(
             LiveModule(this)).build().inject(this)
         Timber.d("video3:  ---  rtmp://${machine.video3} ")
-        video_view.setUp("rtmp://${machine.video3}", false, "demo")
+        video_view.setUp("rtmp://${machine.video3}", false, "wawa")
 //        GSYVideoManager.instance().
 //        video_view.rotation = 90f
         video_view.surface_container.rotation = 90f
@@ -89,9 +93,20 @@ class LiveActivity : AppCompatActivity(),
 
         start_game.setOnClickListener {
             Timber.d("start game")
+//            rxPermission.request(Manifest.permission.CAMERA).subscribe({ granted ->
+//                kotlin.run {
+//                    if (granted) {
+//                        mLivePresenter.createOrder(machine.id ?: -1,
+//                            UserManager.getUser()?.token ?: "")
+//                    } else {
+//                        toast("缺少必要的权限。。。")
+//                    }
+//                }
+//            })
 
-            mLivePresenter.createOrder(machine.id ?: -1, UserManager.getUser()?.token ?: "")
 //            finishWait(2)
+            mLivePresenter.createOrder(machine.id ?: -1,
+                UserManager.getUser()?.token ?: "")
 
             // TODO: 此处为演示切换视频源 请注意检查实际逻辑
 //            video_view.release()
