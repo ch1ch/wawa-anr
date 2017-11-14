@@ -31,12 +31,12 @@
             android:layout_gravity="center"
             android:visibility="visible"/>
 
-        <com.wilddog.video.base.WilddogVideoView
-            android:id="@+id/wild_dog_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:visibility="gone"/>
+        <!--<com.wilddog.video.base.WilddogVideoView-->
+            <!--android:id="@+id/wild_dog_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:visibility="gone"/>-->
 
     </FrameLayout>
 

@@ -80,9 +80,9 @@
         <activity
             android:name=".recharge.RechargeActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".live.TestActivity"
-            android:screenOrientation="portrait" />
+        <!--<activity-->
+            <!--android:name=".live.TestActivity"-->
+            <!--android:screenOrientation="portrait" />-->
         <activity android:name=".web.WebActivity" />
 
 

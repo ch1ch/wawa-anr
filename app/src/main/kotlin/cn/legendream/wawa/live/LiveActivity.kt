@@ -1,6 +1,5 @@
 package cn.legendream.wawa.live
 
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -18,8 +17,6 @@ import cn.legendream.wawa.dolldetail.DollDetailActivity
 import cn.legendream.wawa.recharge.RechargeActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
-import com.wilddog.video.base.LocalStream
-import com.wilddog.video.call.RemoteStream
 import kotlinx.android.synthetic.main.activity_live.*
 import kotlinx.android.synthetic.main.empty_control_video.view.*
 import timber.log.Timber
@@ -42,10 +39,14 @@ class LiveActivity : AppCompatActivity(),
     private val user by lazy {
         UserManager.getUser()
     }
+
+    private val rtmpVideo1 = "rtmp://10799.liveplay.myqcloud.com/live/10799_2bca7708d6"
+    private val rtmpVideo2 = "rtmp://10799.liveplay.myqcloud.com/live/10799_dcb84fc992"
 //    private val rxPermission by lazy {
 //        RxPermissions(this)
 //    }
 
+    private var currentRTMP: String? = null
 
     private val noticeDialog by lazy {
         MaterialDialog.Builder(this).content("等待开始").progress(false, 5, true).positiveText(
@@ -54,7 +55,7 @@ class LiveActivity : AppCompatActivity(),
         }).cancelable(false).build()
     }
 
-    private val progressDialg by lazy {
+    private val progressDialog by lazy {
         MaterialDialog.Builder(this).content("加载中").progress(true, 0).cancelable(false).build()
     }
 
@@ -116,15 +117,18 @@ class LiveActivity : AppCompatActivity(),
 
         btn_catch.setOnClickListener {
             Timber.d("start game video")
-            if (wild_dog_view.visibility == View.VISIBLE) { //游戏中 切换至 直播
-
-                mLivePresenter.catch(machine)
-
-            } else { //  直播 切换至 游戏中
-                video_view.release()
-                showGameControllerPanel()
-                mLivePresenter.startGameVideo(machine.video1 ?: "", machine.video2 ?: "")
-            }
+            mLivePresenter.catch(machine)
+//            if (wild_dog_view.visibility == View.VISIBLE) { //游戏中 切换至 直播
+//
+//
+//
+//            } else { //  直播 切换至 游戏中
+////                video_view.release()
+//                video_view.setUp("rtmp://10799.liveplay.myqcloud.com/live/10799_2bca7708d6", false,
+//                    "wawa")
+//                showGameControllerPanel()
+////                mLivePresenter.startGameVideo(machine.video1 ?: "", machine.video2 ?: "")
+//            }
         }
 
         move_up.setOnClickListener(pawDirectionKeyListener)
@@ -144,7 +148,11 @@ class LiveActivity : AppCompatActivity(),
         }
 
         btn_switch_video.setOnClickListener {
-            mLivePresenter.switchGameVideo()
+            //            mLivePresenter.switchGameVideo()
+            currentRTMP = if (currentRTMP == rtmpVideo1) rtmpVideo2 else rtmpVideo1
+            video_view.release()
+            video_view.setUp(currentRTMP, false, "wawa")
+            video_view.startPlayLogic()
         }
 
         tv_coin_balance.text = user?.gameMoney.toString()
@@ -152,8 +160,8 @@ class LiveActivity : AppCompatActivity(),
 
 
     private fun showLiveControllerPanel() {
-        video_view.visibility = View.VISIBLE
-        wild_dog_view.visibility = View.GONE
+//        video_view.visibility = View.VISIBLE
+//        wild_dog_view.visibility = View.GONE
         start_game.visibility = View.VISIBLE
         iv_charge.visibility = View.VISIBLE
         tv_coin_balance.visibility = View.VISIBLE
@@ -166,8 +174,8 @@ class LiveActivity : AppCompatActivity(),
     }
 
     private fun showGameControllerPanel() {
-        video_view.visibility = View.GONE
-        wild_dog_view.visibility = View.VISIBLE
+//        video_view.visibility = View.GONE
+//        wild_dog_view.visibility = View.VISIBLE
         start_game.visibility = View.GONE
         iv_charge.visibility = View.GONE
         lay_game_controller.visibility = View.VISIBLE
@@ -217,9 +225,14 @@ class LiveActivity : AppCompatActivity(),
     override fun startGame(orderId: String) {
         this.orderId = orderId
         Timber.d("startGame: ")
+//        video_view.release()
+        hideLoading()
+        currentRTMP = rtmpVideo1
         video_view.release()
+        video_view.setUp(currentRTMP, false, "wawa")
+        video_view.startPlayLogic()
         showGameControllerPanel()
-        mLivePresenter.startGameVideo(machine.video1 ?: "", machine.video2 ?: "")
+//        mLivePresenter.startGameVideo(machine.video1 ?: "", machine.video2 ?: "")
     }
 
     override fun updateGameTime(time: Long) {
@@ -259,19 +272,19 @@ class LiveActivity : AppCompatActivity(),
         toast(error)
     }
 
-    override fun showGameVideo(remoteStream: RemoteStream) {
-//        wild_dog_view.visibility = View.VISIBLE
-        Timber.d("show game video")
-        toast("show game video")
-        remoteStream.attach(wild_dog_view)
-        btn_switch_video.visibility = View.VISIBLE
-    }
-
-
-    override fun showLocalVideo(localStream: LocalStream) {
-        Timber.d("show local video")
-        localStream.attach(wild_dog_view)
-    }
+//    override fun showGameVideo(remoteStream: RemoteStream) {
+////        wild_dog_view.visibility = View.VISIBLE
+//        Timber.d("show game video")
+//        toast("show game video")
+//        remoteStream.attach(wild_dog_view)
+//        btn_switch_video.visibility = View.VISIBLE
+//    }
+//
+//
+//    override fun showLocalVideo(localStream: LocalStream) {
+//        Timber.d("show local video")
+//        localStream.attach(wild_dog_view)
+//    }
 
     override fun movePawSuccess(direction: LiveContract.PawDirection) {
         Timber.d("$direction Success")
@@ -293,7 +306,9 @@ class LiveActivity : AppCompatActivity(),
     override fun pawCatchFinish() {
         Timber.d("Paw catch success. ")
         showLiveControllerPanel()
-        mLivePresenter.wildDogDestroy()
+//        mLivePresenter.wildDogDestroy()
+        video_view.release()
+        video_view.setUp(machine.video3, false, "wawa")
         video_view.startPlayLogic()
         val currentOrder = orderId
         if (currentOrder != null) {
@@ -305,22 +320,24 @@ class LiveActivity : AppCompatActivity(),
         Timber.d("Paw catch Failure. $error")
         toast(error)
         showLiveControllerPanel()
-        mLivePresenter.wildDogDestroy()
+//        mLivePresenter.wildDogDestroy()
+        video_view.release()
+        video_view.setUp(machine.video3, false, "wawa")
         video_view.startPlayLogic()
     }
 
     override fun showLoading(message: String) {
         if (!isFinishing) {
-            progressDialg.setContent(message)
-            if (!progressDialg.isShowing) {
-                progressDialg.show()
+            progressDialog.setContent(message)
+            if (!progressDialog.isShowing) {
+                progressDialog.show()
             }
         }
     }
 
     override fun hideLoading() {
         if (!isFinishing) {
-            progressDialg.dismiss()
+            progressDialog.dismiss()
         }
     }
 
