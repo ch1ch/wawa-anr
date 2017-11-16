@@ -13,7 +13,7 @@
         android:layout_marginLeft="18dp"
         android:layout_marginRight="18dp"
         android:layout_marginTop="30dp"
-        android:scaleType="centerInside">
+        android:scaleType="fitCenter">
 
     </ImageView>
 </android.support.constraint.ConstraintLayout>

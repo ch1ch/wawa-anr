@@ -46,7 +46,7 @@ class LiveActivity : AppCompatActivity(),
 //        RxPermissions(this)
 //    }
 
-    private var currentRTMP: String? = null
+    private var currenGameRTMP: String? = null
 
     private val noticeDialog by lazy {
         MaterialDialog.Builder(this).content("等待开始").progress(false, 5, true).positiveText(
@@ -84,8 +84,8 @@ class LiveActivity : AppCompatActivity(),
         DaggerLiveComponent.builder().appComponent(
             (application as WaWaApplication).getAppComponent()).liveModule(
             LiveModule(this)).build().inject(this)
-        Timber.d("video3:  ---  rtmp://${machine.video3} ")
-        video_view.setUp("rtmp://${machine.video3}", false, "wawa")
+        Timber.d("${machine.video3} ")
+        video_view.setUp("${machine.video3}", false, "wawa")
 //        GSYVideoManager.instance().
 //        video_view.rotation = 90f
         video_view.surface_container.rotation = 90f
@@ -149,9 +149,9 @@ class LiveActivity : AppCompatActivity(),
 
         btn_switch_video.setOnClickListener {
             //            mLivePresenter.switchGameVideo()
-            currentRTMP = if (currentRTMP == rtmpVideo1) rtmpVideo2 else rtmpVideo1
+            currenGameRTMP = if (currenGameRTMP == machine.video1) machine.video2 else machine.video1
             video_view.release()
-            video_view.setUp(currentRTMP, false, "wawa")
+            video_view.setUp("$currenGameRTMP", false, "wawa")
             video_view.startPlayLogic()
         }
 
@@ -227,9 +227,9 @@ class LiveActivity : AppCompatActivity(),
         Timber.d("startGame: ")
 //        video_view.release()
         hideLoading()
-        currentRTMP = rtmpVideo1
+        currenGameRTMP = machine.video1
         video_view.release()
-        video_view.setUp(currentRTMP, false, "wawa")
+        video_view.setUp("$currenGameRTMP", false, "wawa")
         video_view.startPlayLogic()
         showGameControllerPanel()
 //        mLivePresenter.startGameVideo(machine.video1 ?: "", machine.video2 ?: "")
@@ -308,7 +308,8 @@ class LiveActivity : AppCompatActivity(),
         showLiveControllerPanel()
 //        mLivePresenter.wildDogDestroy()
         video_view.release()
-        video_view.setUp(machine.video3, false, "wawa")
+        currenGameRTMP = null
+        video_view.setUp("${machine.video3}", false, "wawa")
         video_view.startPlayLogic()
         val currentOrder = orderId
         if (currentOrder != null) {
@@ -322,7 +323,8 @@ class LiveActivity : AppCompatActivity(),
         showLiveControllerPanel()
 //        mLivePresenter.wildDogDestroy()
         video_view.release()
-        video_view.setUp(machine.video3, false, "wawa")
+        currenGameRTMP = null
+        video_view.setUp("${machine.video3}", false, "wawa")
         video_view.startPlayLogic()
     }
 
