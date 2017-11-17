@@ -19,6 +19,7 @@ class EmptyControllerViewPlayer : StandardGSYVideoPlayer {
     init {
 
     }
+
     override fun getLayoutId(): Int {
         return R.layout.empty_control_video
     }
@@ -45,6 +46,13 @@ class EmptyControllerViewPlayer : StandardGSYVideoPlayer {
 
     override fun onInfo(what: Int, extra: Int) {
         super.onInfo(what, extra)
+    }
+
+    fun setVideoRotation(degree: Float) {
+        if (mTextureView.rotation != degree) {
+            mTextureView.rotation = degree
+            requestLayout()
+        }
     }
 
 }

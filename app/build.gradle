@@ -125,7 +125,7 @@ dependencies {
     implementation('com.hwangjr.rxbus:rxbus:2.0.0') {
         exclude group: 'com.jakewharton.timber', module: 'timber'
     }
-    implementation 'com.shuyu:GSYVideoPlayer:2.1.0'
+    implementation 'com.shuyu:GSYVideoPlayer:2.1.1'
     implementation('com.wilddog.client:wilddog-sync-android:2.3.7') {
         exclude group: 'org.json', module: 'json'
     }

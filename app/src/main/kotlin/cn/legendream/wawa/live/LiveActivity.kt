@@ -16,6 +16,9 @@ import cn.legendream.wawa.app.user.UserManager
 import cn.legendream.wawa.dolldetail.DollDetailActivity
 import cn.legendream.wawa.recharge.RechargeActivity
 import com.afollestad.materialdialogs.MaterialDialog
+import com.shuyu.gsyvideoplayer.GSYVideoManager
+import com.shuyu.gsyvideoplayer.utils.GSYVideoType
+import com.shuyu.gsyvideoplayer.utils.OrientationUtils
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
 import kotlinx.android.synthetic.main.activity_live.*
 import kotlinx.android.synthetic.main.empty_control_video.view.*
@@ -78,18 +81,21 @@ class LiveActivity : AppCompatActivity(),
         init()
     }
 
-
     private fun init() {
         machine = intent.getParcelableExtra(ExtraKey.EXTRA_MACHINE)
         DaggerLiveComponent.builder().appComponent(
             (application as WaWaApplication).getAppComponent()).liveModule(
             LiveModule(this)).build().inject(this)
+        GSYVideoManager.instance().isNeedMute = true
+//        val displayMetrics = resources.displayMetrics
+//        GSYVideoManager.instance().currentVideoHeight = (displayMetrics.heightPixels * 0.8).toInt()
+//        GSYVideoManager.instance().currentVideoWidth = displayMetrics.widthPixels
+        GSYVideoType.setShowType(GSYVideoType.SCREEN_TYPE_FULL)
         Timber.d("${machine.video3} ")
         video_view.setUp("${machine.video3}", false, "wawa")
-//        GSYVideoManager.instance().
 //        video_view.rotation = 90f
-        video_view.surface_container.rotation = 90f
         video_view.startPlayLogic()
+        video_view.setVideoRotation(90f)
 
 
         start_game.setOnClickListener {
